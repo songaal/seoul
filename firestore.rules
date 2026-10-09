@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// seoul — 누가 무엇을 읽고 쓸 수 있는지 정하는 규칙입니다.
+// 로그인한 사람은 모두 읽을 수 있고, 쓰기와 지우기는 본인 것만 됩니다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function mine(field) { return resource == null || resource.data[field] == request.auth.uid; }
+
+    // 프로필: 문서 이름이 곧 그 사람의 계정 ID
+    match /profiles/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid;
+    }
+
+    // 게시물
+    match /posts/{postId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+                                  && request.resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && mine('uid');
+    }
+
+    // 좋아요: 문서 이름은 "게시물ID~내ID"
+    match /likes/{likeId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.u == request.auth.uid
+                                  && likeId == request.resource.data.p + '~' + request.auth.uid;
+      allow delete: if signedIn() && mine('u');
+    }
+
+    // 팔로우: 문서 이름은 "내ID~상대ID"
+    match /follows/{followId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.u == request.auth.uid
+                                  && followId == request.auth.uid + '~' + request.resource.data.t;
+      allow delete: if signedIn() && mine('u');
+    }
+
+    // 댓글
+    match /comments/{commentId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.u == request.auth.uid
+                                  && request.resource.data.t is string
+                                  && request.resource.data.t.size() <= 200;
+      allow delete: if signedIn() && mine('u');
+    }
+
+    // 나만 보는 것: 저장한 게시물, 추천 조절, 아직 열리지 않은 타임캡슐
+    match /data/users/{uid}/{docId} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+  }
+}
