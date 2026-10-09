@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.songaal.seoul",
+      "sha256_cert_fingerprints": [
+        "9B:5A:4F:A2:E4:1B:EA:B1:9C:F3:62:B3:CA:DA:1F:BC:05:C1:9D:30:0D:CB:67:25:CA:90:56:F3:8E:95:DB:71"
+      ]
+    }
+  }
+]

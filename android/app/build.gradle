@@ -1,0 +1,68 @@
+plugins {
+    id 'com.android.application'
+}
+
+// The app is a thin shell: it opens the seoul website full screen in the phone's own Chrome.
+// Everything the user sees is the site, so updating the site updates the app.
+def site = [
+    hostName : 'songaal.github.io',
+    launchUrl: '/seoul/',
+]
+
+android {
+    namespace 'io.github.songaal.seoul'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'io.github.songaal.seoul'
+        minSdk 21
+        targetSdk 34
+        versionCode((System.getenv('VERSION_CODE') ?: '1') as Integer)
+        versionName(System.getenv('VERSION_NAME') ?: '1.0')
+
+        manifestPlaceholders = [
+            hostName  : site.hostName,
+            defaultUrl: 'https://' + site.hostName + site.launchUrl,
+        ]
+
+        // Tells Android which website this app belongs to (the site confirms it back in assetlinks.json).
+        resValue 'string', 'assetStatements',
+            '[{ \\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"],' +
+            ' \\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://' + site.hostName + '\\"}}]'
+    }
+
+    signingConfigs {
+        release {
+            // The keystore in signing/ is locked; its password comes from the KEYSTORE_PASSWORD secret.
+            def pw = System.getenv('KEYSTORE_PASSWORD')
+            if (pw) {
+                storeFile file('../signing/seoul-release.p12')
+                storeType 'pkcs12'
+                storePassword pw
+                keyAlias 'seoul'
+                keyPassword pw
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}
