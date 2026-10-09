@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>seoul</title>
+<meta name="description" content="관심사로 이어지는 SNS">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141327" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="seoul">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
@@ -383,6 +393,20 @@ var CONFIG = {
 };
 /* 2) Storage를 켠 뒤에만 true 로 바꾸세요. false 면 사진만(작게) 올라가고 동영상은 못 올립니다. */
 var USE_STORAGE = false;
+</script>
+<script>
+/* 앱으로 설치: 브라우저가 설치할 수 있다고 알려 주면 그 순간을 붙잡아 두었다가, 설치 버튼을 누를 때 씁니다. */
+(function(){
+  var deferred = null;
+  window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred = e; });
+  window.addEventListener("appinstalled", function(){ deferred = null; });
+  window.INSTALL = {
+    standalone: function(){ return (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; },
+    can: function(){ return !!deferred; },
+    ios: function(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); },
+    go: function(){ if (!deferred) return Promise.resolve(false); var e = deferred; deferred = null; e.prompt(); return e.userChoice.then(function(c){ return !!c && c.outcome === "accepted"; }, function(){ return false; }); }
+  };
+})();
 </script>
 <script>
 /* 노래 검색: Apple의 공개 검색 서비스를 씁니다. 게시물에는 곡 페이지 링크와, 눌렀을 때만 나오는 30초 미리듣기가 붙습니다. */
@@ -799,6 +823,7 @@ function loginHTML(){
         '<button class="btn primary wide" style="flex:none" data-act="start">프로필 만들기</button><button class="link" data-act="logout">다른 계정으로 로그인</button>';
   else h += '<button class="btn primary wide" style="flex:none" data-act="glogin"' + (ui.busy ? " disabled" : "") + ">" + (ui.busy ? "로그인하는 중…" : "Google 계정으로 로그인") + "</button>";
   if (!auth && ui.canPreview && !ui.preview) h += '<button class="btn ghost wide" style="flex:none" data-act="preview">로그인 없이 미리보기</button>';
+  if (!ui.preview) h += installHTML();
   h += '<p class="muted small">' + esc(ui.loginMsg || "구글 계정으로 로그인하면 어느 기기에서든 같은 프로필로 들어옵니다. 비밀번호는 구글에만 입력하고, seoul은 받거나 저장하지 않아요.") + "</p></main>";
   return h;
 }
@@ -900,6 +925,7 @@ function profileHTML(id){
   else h += '<div class="feed" style="padding-top:8px">' + posts.map(function(q){ return postCard(q, false); }).join("") + "</div>";
   h += "</div>";
 
+  if (me && typeof installHTML === "function"){ var ih = installHTML(); if (ih) h += '<div class="pad">' + ih + "</div>"; }
   if (me && !ui.ro) h += '<div class="pad">' + (ui.confirm === "reset"
     ? '<div class="confirm"><p><b>계정을 삭제할까요?</b><br>프로필, 내 게시물, 좋아요, 댓글이 모든 기기에서 지워집니다. 되돌릴 수 없어요.</p><div class="row"><button class="btn danger" data-act="reset-yes">계정 삭제</button><button class="btn small" data-act="confirm-no">취소</button></div></div>'
     : '<div class="rowhead"><button class="link" data-act="logout">로그아웃</button><button class="link" data-act="reset">계정 삭제</button></div>') + "</div>";
@@ -1375,6 +1401,7 @@ document.addEventListener("click", function(e){
   else if (a === "start"){ startSignup(); go(0); }
   else if (a === "glogin"){ googleLogin(); }
   else if (a === "preview"){ enterPreview(); }
+  else if (a === "install"){ window.INSTALL.go().then(function(ok){ if (ok) toast("설치했어요. 홈 화면에서 seoul을 열어 보세요."); render(true); }); }
   else if (a === "logout"){ if (auth) auth.signOut(); else location.reload(); }
   /* signup */
   else if (a === "next"){
@@ -1686,6 +1713,13 @@ function setupHTML(){
   return '<main class="splash"><div class="brand big">seoul<i>.</i></div><p class="muted">' + esc(ui.bootMsg || "연결하지 못했어요. 새로 고쳐 주세요.") + "</p>" +
     (ui.canPreview ? '<button class="btn primary wide" style="flex:none" data-act="preview">미리보기로 둘러보기</button>' +
       '<p class="muted small">미리보기는 구글 로그인 없이 들어가고, 글과 사진이 이 기기에만 저장됩니다. 실제 사이트는 README 순서대로 Firebase를 연결하면 켜집니다.</p>' : "") + "</main>";
+}
+/* putting the site on the phone's home screen, where it opens like an app */
+function installHTML(){
+  var it = window.INSTALL; if (!it || it.standalone()) return "";
+  if (it.can()) return '<button class="btn small wide" data-act="install">휴대폰에 앱으로 설치</button>';
+  if (it.ios()) return '<p class="muted small">아이폰에 앱으로 넣으려면 Safari 아래쪽 공유 버튼을 누르고 홈 화면에 추가를 고르세요.</p>';
+  return '<p class="muted small">앱으로 넣으려면 브라우저 메뉴에서 홈 화면에 추가 또는 앱 설치를 고르세요.</p>';
 }
 function startSignup(){
   D = blank();
