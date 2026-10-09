@@ -2,11 +2,19 @@ rules_version = '2';
 
 // seoul — 누가 무엇을 읽고 쓸 수 있는지 정하는 규칙입니다.
 // 로그인한 사람은 모두 읽을 수 있고, 쓰기와 지우기는 본인 것만 됩니다.
+// 앱 주인(관리자)은 남의 게시물과 댓글을 지우고, 들어온 신고를 볼 수 있습니다.
 service cloud.firestore {
   match /databases/{database}/documents {
 
     function signedIn() { return request.auth != null; }
     function mine(field) { return resource == null || resource.data[field] == request.auth.uid; }
+
+    // 앱 주인의 구글 계정 메일. Firebase 콘솔에 붙여 넣을 때 본인 메일로 바꿉니다.
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.token.email_verified == true
+          && request.auth.token.email == 'OWNER_EMAIL_HERE';
+    }
 
     // 프로필: 문서 이름이 곧 그 사람의 계정 ID
     match /profiles/{uid} {
@@ -14,13 +22,13 @@ service cloud.firestore {
       allow write: if signedIn() && request.auth.uid == uid;
     }
 
-    // 게시물
+    // 게시물 (동영상 조각도 여기에 들어갑니다)
     match /posts/{postId} {
       allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
       allow update: if signedIn() && resource.data.uid == request.auth.uid
                                   && request.resource.data.uid == request.auth.uid;
-      allow delete: if signedIn() && mine('uid');
+      allow delete: if signedIn() && (mine('uid') || isAdmin());
     }
 
     // 좋아요: 문서 이름은 "게시물ID~내ID"
@@ -28,7 +36,7 @@ service cloud.firestore {
       allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.u == request.auth.uid
                                   && likeId == request.resource.data.p + '~' + request.auth.uid;
-      allow delete: if signedIn() && mine('u');
+      allow delete: if signedIn() && (mine('u') || isAdmin());
     }
 
     // 팔로우: 문서 이름은 "내ID~상대ID"
@@ -45,10 +53,16 @@ service cloud.firestore {
       allow create: if signedIn() && request.resource.data.u == request.auth.uid
                                   && request.resource.data.t is string
                                   && request.resource.data.t.size() <= 200;
-      allow delete: if signedIn() && mine('u');
+      allow delete: if signedIn() && (mine('u') || isAdmin());
     }
 
-    // 나만 보는 것: 저장한 게시물, 추천 조절, 아직 열리지 않은 타임캡슐
+    // 신고: 누구나 낼 수 있고, 읽고 닫는 것은 앱 주인만
+    match /reports/{reportId} {
+      allow create: if signedIn() && request.resource.data.by == request.auth.uid;
+      allow read, delete: if isAdmin();
+    }
+
+    // 나만 보는 것: 저장한 게시물, 추천 조절, 차단 목록, 아직 열리지 않은 타임캡슐
     match /data/users/{uid}/{docId} {
       allow read, write: if signedIn() && request.auth.uid == uid;
     }

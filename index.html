@@ -376,6 +376,22 @@ svg.i{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .vtapc{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:10px}
 .vtapc svg.i{width:46px;height:46px;fill:currentColor}
 .vtapc b{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--stage)}
+/* more menu and the report inbox */
+:root{--scrim:rgba(12,11,24,.5)}
+.phd .more{width:36px;height:36px;margin-right:-8px;color:var(--ink-2)}
+.ib.more svg.i,.iconbtn svg.i{stroke-width:2.6}
+.scrim{position:absolute;inset:0;z-index:7;background:var(--scrim)}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:8;background:var(--surface);border-radius:18px 18px 0 0;padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow)}
+.stitle{padding:10px 8px 6px;font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.sbtn{min-height:48px;padding:0 12px;border-radius:12px;text-align:left;font-size:15px;font-weight:600}
+.sbtn:hover{background:var(--surface-2)}
+.sbtn.danger{color:var(--danger)}
+.rrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.rtxt{min-width:0;font-size:14px;overflow-wrap:anywhere}
+.rtxt b,.rtxt span,.rtxt small{display:block}
+.rtxt small{color:var(--ink-2);font-size:12px;margin-top:2px}
+.racts{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:8px}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .2s ease-out}}
 .robar{margin:0;padding:8px 16px;font-size:12px;background:var(--accent-soft);color:var(--ink);text-align:center}
 </style>
 
@@ -492,6 +508,9 @@ var ME = "guest";     // my id on this artifact
 var S = null;         // my public profile
 var SAVES = [], TUNE = {w:{}, mute:[]};
 var SEEN = 0;         // when I last opened my notifications
+var BLOCKS = [];      // accounts I blocked (private): their posts and comments are hidden from me
+var HIDE = [];        // posts I reported (private): hidden from me while the owner of the app looks at them
+var REPORTS = [];     // open reports, delivered only to the person who runs the app
 var KNOWN = null;     // post ids already delivered, to spot a new one arriving
 var PROF = {};        // uid -> public profile
 var RP = [];          // real posts
@@ -504,7 +523,7 @@ var VURL = {}, VLOAD = {}; // such videos already fetched in this view, and the 
 var D = null;         // working copy while signing up / editing
 var N = draft();      // new post draft
 var ui = { view:"boot", mode:"signup", step:0, touched:false, tab:"home", stack:[], rootY:0, ptab:"grid", ltab:"likes", ftab:"following",
-           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0 };
+           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0, sheet:null, admin:false };
 var app = document.getElementById("app");
 var toastTimer = null, liveTimer = null, popTimer = null, wq = {}, opening = {};
 
@@ -556,6 +575,7 @@ var I = {
   lock:   ico('<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>'),
   stop:   ico('<rect x="7" y="7" width="10" height="10" rx="1.5"/>'),
   play:   ico('<path d="M8 5.5v13l11-6.5z"/>'),
+  more:   ico('<circle cx="5.5" cy="12" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="18.5" cy="12" r="1.1"/>'),
   list:   ico('<rect x="6" y="5" width="12" height="14" rx="1"/><path d="M6 2.5h12M6 21.5h12"/>')
 };
 function toast(msg){
@@ -588,7 +608,7 @@ function put(key, ref, dataFn){
 }
 function idle(key){ var q = wq[key]; return !q || (!q.busy && !q.dirty); }
 function saveProfile(){ if (ui.ro || !S) return; put("p", db.doc("profiles/" + ME), function(){ return clone(S); }); }
-function savePrivate(){ if (ui.ro) return; put("s", priv("state"), function(){ return {saves:SAVES.slice(), tune:clone(TUNE), seen:SEEN}; }); }
+function savePrivate(){ if (ui.ro) return; put("s", priv("state"), function(){ return {saves:SAVES.slice(), tune:clone(TUNE), seen:SEEN, blocks:BLOCKS.slice(), hide:HIDE.slice(-200)}; }); }
 
 /* ---------- people ---------- */
 function who(id){
@@ -608,7 +628,8 @@ function av(id, size){
   return avatar(a ? {nick:a.name, hue:FBY[a.f].h} : {nick:"?", hue:18}, size);
 }
 function ring(inner, on){ return '<span class="ring' + (on ? " on" : "") + '">' + inner + "</span>"; }
-function others(){ return Object.keys(PROF).filter(function(id){ return id !== ME; }).map(who); }
+function others(){ return Object.keys(PROF).filter(function(id){ return id !== ME && !has(BLOCKS, id); }).map(who); }
+function visible(p){ return p.mine || (!has(BLOCKS, p.a) && !has(HIDE, p.id)); }
 function rankedAuthors(){
   return AUTHORS.map(function(a, i){ return {a:a, i:i, s:(has(MYF, a.id) ? 2 : 0) + (has(S.fields, a.f) ? 1 : 0)}; })
     .sort(function(x, y){ return y.s - x.s || x.i - y.i; }).map(function(x){ return x.a; });
@@ -655,7 +676,7 @@ function mutedPost(p){ var s = (p.t + " " + p.tag + " " + who(p.a).name).toLower
 function passes(q){ return (!q.f || tw(q.f) > 0) && !mutedPost(q); }
 function shownCount(){ return POSTS.filter(function(p){ return passes(exPost(p)); }).length; }
 function tuneTotals(){
-  var real = RP.map(realPost).filter(function(p){ return !p.mine; });
+  var real = RP.map(realPost).filter(function(p){ return !p.mine && visible(p); });
   return {total:POSTS.length + real.length, shown:shownCount() + real.filter(passes).length};
 }
 function feed(all){
@@ -664,7 +685,7 @@ function feed(all){
     return {p:q, i:i, s:(has(S.fields, q.f) ? 2 : 0) + (has(S.follows, q.tag) ? 1 : 0) + (has(MYF, q.a) ? 2 : 0) + (all ? 0 : (tw(q.f) - 2) * 2)};
   }).filter(function(x){ return all || passes(x.p); })
     .sort(function(a, b){ return b.s - a.s || a.i - b.i; }).map(function(x){ return x.p; });
-  var real = RP.map(realPost).filter(function(p){ return all || p.mine || passes(p); })
+  var real = RP.map(realPost).filter(function(p){ return visible(p) && (all || p.mine || passes(p)); })
     .sort(function(a, b){ return (b.openedAt || b.at) - (a.openedAt || a.at); });
   return real.concat(ex);
 }
@@ -709,11 +730,12 @@ function followBtn(id, wide){
   return '<button class="fbtn' + (wide ? " wide" : "") + '" data-act="fuser" data-id="' + esc(id) + '" aria-pressed="' + on + '">' + (on ? "팔로잉" : "팔로우") + "</button>";
 }
 function postCard(p, detail){
-  var a = who(p.a), liked = has(MYL, p.id), saved = has(SAVES, p.id), cs = CM[p.id] || [], open = detail || ui.openC === p.id, n = (LK[p.id] || []).length;
+  var a = who(p.a), liked = has(MYL, p.id), saved = has(SAVES, p.id), cs = (CM[p.id] || []).filter(function(c){ return !has(BLOCKS, c.u); }), open = detail || ui.openC === p.id, n = (LK[p.id] || []).length;
   var sub = [p.f ? FBY[p.f].name : "", p.ex ? "예시" : ago(p.openedAt || p.at), p.capsule ? ymd(p.at) + "에 묻은 타임캡슐" : ""].filter(Boolean).join(" · ");
   var h = '<article class="post">';
   h += '<div class="phd"><button class="who" data-act="user" data-id="' + esc(a.id) + '">' + ring(av(a.id, 34), a.me || has(MYF, a.id)) +
-       '<span class="wt"><b>' + esc(a.name) + "</b>" + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</span></button>" + (a.me || a.gone ? "" : followBtn(a.id)) + "</div>";
+       '<span class="wt"><b>' + esc(a.name) + "</b>" + (sub ? "<small>" + esc(sub) + "</small>" : "") + "</span></button>" + (a.me || a.gone ? "" : followBtn(a.id)) +
+       (p.ex ? "" : '<button class="ib more" data-act="more" data-id="' + p.id + '" aria-label="더보기">' + I.more + "</button>") + "</div>";
   if (p.song && p.song.t){
     var su = /^https:\/\//.test(p.song.u || "") ? p.song.u : "", sp = /^https:\/\//.test(p.song.pv || "") ? p.song.pv : "", on = ui.playing === p.id;
     var shop = /\/\/music\.apple\.com\//.test(su) ? "Apple Music" : /\/\/open\.spotify\.com\//.test(su) ? "Spotify" : "";
@@ -737,8 +759,9 @@ function postCard(p, detail){
         var w = who(c.u);
         return '<li><button class="cav" data-act="user" data-id="' + esc(c.u) + '" aria-label="' + esc(w.name) + ' 프로필 보기">' + av(c.u, 34) + "</button>" +
           '<div class="cbody"><div><b>' + esc(w.name) + "</b><small>" + ago(c.at) + "</small></div><p>" + esc(c.t) + "</p></div>" +
-          (c.u === ME ? '<button class="link sm" data-act="delc" data-id="' + p.id + '" data-c="' + esc(c.id) + '">삭제</button>' : "") + "</li>"; }).join("") + "</ul>" +
-        (left > 0 ? '<button class="btn small wide" data-act="cmore" data-id="' + p.id + '">더보기 (' + left + "개 남음)</button>" : "")
+          (c.u === ME ? '<button class="link sm" data-act="delc" data-id="' + p.id + '" data-c="' + esc(c.id) + '">삭제</button>'
+                      : (ui.ro || c.id.indexOf("tmp") === 0 ? "" : '<button class="link sm" data-act="cmore" data-id="' + p.id + '" data-c="' + esc(c.id) + '" data-u="' + esc(c.u) + '">' + (ui.admin ? "관리" : "신고") + "</button>")) + "</li>"; }).join("") + "</ul>" +
+        (left > 0 ? '<button class="btn small wide" data-act="cshow" data-id="' + p.id + '">더보기 (' + left + "개 남음)</button>" : "")
       : '<p class="muted small">아직 댓글이 없어요.' + (ui.ro ? "" : " 첫 댓글을 남겨 보세요.") + "</p>";
     h += "</section>";
   }
@@ -772,7 +795,7 @@ function ptime(p){ return p.openedAt || p.at || 0; }
 function notifs(){
   var since = {};
   FOL.forEach(function(x){ if (x.u === ME) since[x.t] = x.at || 0; });
-  return RP.map(realPost).filter(function(p){ return !p.mine && since[p.a] != null && ptime(p) >= since[p.a]; })
+  return RP.map(realPost).filter(function(p){ return !p.mine && visible(p) && since[p.a] != null && ptime(p) >= since[p.a]; })
     .sort(function(a, b){ return ptime(b) - ptime(a); }).slice(0, 30);
 }
 function unread(){ return notifs().filter(function(p){ return ptime(p) > SEEN; }).length; }
@@ -798,6 +821,79 @@ function popHTML(){
 function showPop(id){
   ui.pop = id; clearTimeout(popTimer);
   popTimer = setTimeout(function(){ ui.pop = null; var e = app.querySelector(".npop"); if (e) e.remove(); }, 7000);
+}
+
+/* ---------- report, block, and removal by the person who runs the app ---------- */
+var REASONS = ["스팸·광고", "욕설·괴롭힘", "음란물", "폭력·위험한 내용", "기타"];
+function sbtn(act, label, attrs, danger){ return '<button class="sbtn' + (danger ? " danger" : "") + '" data-act="' + act + '"' + (attrs || "") + ">" + label + "</button>"; }
+function sheetHTML(){
+  var sh = ui.sheet, h = "", p, tgt;
+  if (!sh) return "";
+  if (sh.k === "post"){
+    p = getPost(sh.id); if (!p) return "";
+    if (p.mine) h += sbtn("s-del", "게시물 삭제", ' data-id="' + p.id + '"', true);
+    else {
+      h += sbtn("s-report", "신고하기", ' data-kind="post" data-id="' + p.id + '" data-u="' + esc(p.a) + '"');
+      h += sbtn("s-block", esc(who(p.a).name) + "님 차단", ' data-id="' + esc(p.a) + '"');
+      if (ui.admin) h += sbtn("s-del", "관리자 권한으로 삭제", ' data-id="' + p.id + '"', true);
+    }
+  } else if (sh.k === "user"){
+    h += sbtn("s-report", "신고하기", ' data-kind="user" data-id="' + esc(sh.id) + '" data-u="' + esc(sh.id) + '"');
+    h += has(BLOCKS, sh.id) ? sbtn("unblock", "차단 해제", ' data-id="' + esc(sh.id) + '"') : sbtn("s-block", esc(who(sh.id).name) + "님 차단", ' data-id="' + esc(sh.id) + '"');
+  } else if (sh.k === "cmt"){
+    h += sbtn("s-report", "댓글 신고하기", ' data-kind="comment" data-id="' + esc(sh.cid) + '" data-u="' + esc(sh.u) + '" data-p="' + esc(sh.pid) + '"');
+    h += sbtn("s-block", esc(who(sh.u).name) + "님 차단", ' data-id="' + esc(sh.u) + '"');
+    if (ui.admin) h += sbtn("s-delc", "관리자 권한으로 댓글 삭제", ' data-id="' + esc(sh.pid) + '" data-c="' + esc(sh.cid) + '"', true);
+  } else if (sh.k === "why"){
+    h += '<p class="stitle">신고하는 이유를 골라 주세요</p>' + REASONS.map(function(r, i){ return sbtn("s-why", r, ' data-i="' + i + '"'); }).join("");
+  } else if (sh.k === "sure"){
+    h += '<p class="stitle">' + esc(sh.q) + "</p>" + sbtn(sh.act, sh.yes, sh.attrs, true);
+  }
+  return '<div class="scrim" data-act="s-close"></div><div class="sheet" role="dialog" aria-label="더보기">' + h + sbtn("s-close", "닫기") + "</div>";
+}
+function blockUser(id){
+  if (id === ME || has(BLOCKS, id)) return;
+  BLOCKS.push(id);
+  var fi = -1; FOL.forEach(function(x, k){ if (x.u === ME && x.t === id) fi = k; });
+  if (fi !== -1){ FOL.splice(fi, 1); db.doc("follows/" + ME + "~" + id).delete().catch(function(){}); }
+  savePrivate(); derive();
+}
+function sendReport(t, why){
+  var r = {by:ME, kind:t.kind, target:t.id, owner:t.u || "", reason:why, at:Date.now()};
+  if (t.p) r.pid = t.p;
+  if (t.kind === "post" && !has(HIDE, t.id)){ HIDE.push(t.id); savePrivate(); }
+  return db.collection("reports").add(r);
+}
+/* closes every report about this post or comment, and reports about comments under a post that is going away */
+function closeReportsFor(target){
+  var hit = function(r){ return r.target === target || r.pid === target; };
+  REPORTS.filter(hit).forEach(function(r){ db.doc("reports/" + r.id).delete().catch(function(){}); });
+  REPORTS = REPORTS.filter(function(r){ return !hit(r); });
+}
+function subReports(){
+  db.collection("reports").orderBy("at", "desc").limit(100).onSnapshot(function(s){
+    REPORTS = s.docs.map(function(d){ var x = clone(d.data()); x.id = d.id; return x; }); live();
+  }, function(){ ui.admin = false; });
+}
+function reportsHTML(){
+  if (!REPORTS.length) return '<div class="empty"><b>들어온 신고가 없어요</b><span>누가 게시물, 댓글, 계정을 신고하면 여기에 모입니다.</span></div>';
+  return '<div class="nlist">' + REPORTS.map(function(r){
+    var p = r.kind === "post" ? getPost(r.target) : null, c = null, body, acts = "";
+    if (r.kind === "comment") (CM[r.pid] || []).forEach(function(x){ if (x.id === r.target) c = x; });
+    if (r.kind === "post") body = p ? "게시물 · " + esc(who(p.a).name) + (p.t ? " · " + esc(p.t.slice(0, 40)) : "") : "게시물 · 이미 지워졌어요";
+    else if (r.kind === "comment") body = c ? "댓글 · " + esc(who(c.u).name) + " · " + esc(c.t.slice(0, 60)) : "댓글 · 이미 지워졌어요";
+    else body = "계정 · " + esc(who(r.target).name);
+    if (r.kind === "post" && p) acts += '<button class="btn small" data-act="post" data-id="' + p.id + '">보기</button><button class="btn small" data-act="r-del" data-id="' + esc(r.id) + '">게시물 삭제</button>';
+    if (r.kind === "comment" && c) acts += '<button class="btn small" data-act="post" data-id="' + esc(r.pid) + '">보기</button><button class="btn small" data-act="r-del" data-id="' + esc(r.id) + '">댓글 삭제</button>';
+    if (r.kind === "user") acts += '<button class="btn small" data-act="user" data-id="' + esc(r.target) + '">프로필 보기</button>';
+    acts += '<button class="btn small" data-act="r-close" data-id="' + esc(r.id) + '">신고 닫기</button>';
+    return '<div class="rrow"><div class="rtxt"><b>' + esc(r.reason || "기타") + "</b><span>" + body + "</span><small>" + esc(who(r.by).name) + "님이 신고 · " + ago(r.at || 0) + "</small></div>" +
+           (p ? '<span class="nthumb">' + thumbHTML(p) + "</span>" : "") + '<div class="racts">' + acts + "</div></div>"; }).join("") + "</div>";
+}
+function blocksHTML(){
+  if (!BLOCKS.length) return '<div class="empty"><b>차단한 계정이 없어요</b></div>';
+  return '<div class="ulist">' + BLOCKS.map(function(id){ var a = who(id);
+    return '<div class="urow"><span class="who">' + av(id, 46) + '<span class="wt"><b>' + esc(a.name) + '</b></span></span><button class="btn small" data-act="unblock" data-id="' + esc(id) + '">차단 해제</button></div>'; }).join("") + "</div>";
 }
 
 /* ---------- time capsules ---------- */
@@ -910,6 +1006,7 @@ function homeHTML(){
   return h;
 }
 function profileHTML(id){
+  if (id !== ME && has(BLOCKS, id)) return '<div class="empty">' + av(id, 72) + "<b>" + esc(who(id).name) + '</b><span>차단한 계정이에요. 이 사람의 글과 댓글이 내 화면에 보이지 않습니다.</span><button class="btn small" data-act="unblock" data-id="' + esc(id) + '">차단 해제</button></div>';
   var me = id === ME, a = who(id), ex = !!ABY[id], p = me ? S : PROF[id], posts = postsOf(id);
   var followers = FOL.filter(function(x){ return x.t === id; }).length, following = FOL.filter(function(x){ return x.u === id; }).length;
   var st = function(n, l, w){ return me && w ? '<button data-act="follows" data-w="' + w + '"><b>' + n + "</b><span>" + l + "</span></button>" : "<span><b>" + n + "</b><span>" + l + "</span></span>"; };
@@ -938,6 +1035,9 @@ function profileHTML(id){
   else h += '<div class="feed" style="padding-top:8px">' + posts.map(function(q){ return postCard(q, false); }).join("") + "</div>";
   h += "</div>";
 
+  if (me && !ui.ro && (ui.admin || BLOCKS.length)) h += '<div class="pad group">' +
+      (ui.admin ? '<button class="btn small wide" data-act="reports">신고함' + (REPORTS.length ? " · 새 신고 " + REPORTS.length + "건" : " · 들어온 신고 없음") + "</button>" : "") +
+      (BLOCKS.length ? '<button class="btn small wide" data-act="blocks">차단한 계정 ' + BLOCKS.length + "</button>" : "") + "</div>";
   if (me && typeof installHTML === "function"){ var ih = installHTML(); if (ih) h += '<div class="pad">' + ih + "</div>"; }
   if (me && !ui.ro) h += '<div class="pad">' + (ui.confirm === "reset"
     ? '<div class="confirm"><p><b>계정을 삭제할까요?</b><br>프로필, 내 게시물, 좋아요, 댓글이 모든 기기에서 지워집니다. 되돌릴 수 없어요.</p><div class="row"><button class="btn danger" data-act="reset-yes">계정 삭제</button><button class="btn small" data-act="confirm-no">취소</button></div></div>'
@@ -1188,9 +1288,12 @@ function appHTML(){
   else if (c.type === "follows"){ body = followsHTML(); title = S.nick; }
   else if (c.type === "tune"){ body = tuneHTML(); title = "추천 조절"; }
   else if (c.type === "notif"){ body = notifHTML(); title = "알림"; }
+  else if (c.type === "reports"){ body = reportsHTML(); title = "신고함"; }
+  else if (c.type === "blocks"){ body = blocksHTML(); title = "차단한 계정"; }
   else if (c.type === "note"){ body = noteHTML(); title = "노트"; form = true; }
   else { var p = getPost(c.id); body = p ? postCard(p, true) : '<div class="empty"><b>게시물을 찾을 수 없어요</b><span>삭제됐을 수 있습니다.</span></div>'; title = "게시물"; }
-  var top = sub ? '<header class="top deep"><button class="iconbtn" data-act="back" aria-label="뒤로">' + I.back + '</button><div class="ttl">' + esc(title) + '</div><span class="iconbtn" aria-hidden="true"></span></header>'
+  var top = sub ? '<header class="top deep"><button class="iconbtn" data-act="back" aria-label="뒤로">' + I.back + '</button><div class="ttl">' + esc(title) + "</div>" +
+                   (c.type === "user" && !ABY[c.id] && !ui.ro ? '<button class="iconbtn" data-act="umore" data-id="' + esc(c.id) + '" aria-label="더보기">' + I.more + "</button>" : '<span class="iconbtn" aria-hidden="true"></span>') + "</header>"
                 : '<header class="top">' + (title ? '<div class="ttl">' + esc(title) + "</div>" : '<div class="brand">seoul<i>.</i></div><span class="topacts"><button class="iconbtn nbell" data-act="notif" aria-label="알림' + (nu ? " " + nu + "개" : "") + '">' + I.bell + (nu ? '<span class="ndot">' + (nu > 9 ? "9+" : nu) + "</span>" : "") + "</button>" +
                                                                          '<button class="iconbtn" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></span>") + "</header>";
   var tabs = [["home","홈",I.home],["search","검색",I.search],["new","새 게시물",I.plus],["likes","좋아요·저장",I.heart],["profile","내 프로필",I.user]];
@@ -1208,7 +1311,7 @@ function render(keep, y){
   app.innerHTML = (v === "boot" ? splashHTML("연결하는 중…") :
                    v === "nodb" ? setupHTML() :
                    v === "login" ? loginHTML() : v === "signup" ? signupHTML() : appHTML()) +
-                  (v === "app" ? popHTML() : "") +
+                  (v === "app" ? popHTML() + sheetHTML() : "") +
                   (ui.toast ? '<div class="toast" role="status">' + esc(ui.toast) + "</div>" : "");
   sc = scroller(); if (sc) sc.scrollTop = top;
   /* a redraw keeps each post on the photo it was showing */
@@ -1397,7 +1500,7 @@ function deletePost(id){
   (LK[id] || []).forEach(function(u){ db.doc("likes/" + id + "~" + u).delete().catch(function(){}); });
   RP = RP.filter(function(x){ return x.id !== id; });
   toggleOff(SAVES, id); savePrivate();
-  S.layout.order = S.layout.order.filter(function(x){ return x !== id; }); delete S.layout.size[id]; saveProfile();
+  if (r && r.uid === ME){ S.layout.order = S.layout.order.filter(function(x){ return x !== id; }); delete S.layout.size[id]; saveProfile(); }
 }
 function toggleOff(a, v){ var i = a.indexOf(v); if (i !== -1) a.splice(i, 1); }
 function deleteAccount(){
@@ -1409,7 +1512,7 @@ function deleteAccount(){
   Object.keys(CM).forEach(function(pid){ CM[pid].forEach(function(c){ if (c.u === ME && c.id.indexOf("tmp") !== 0) jobs.push(db.doc("comments/" + c.id).delete()); }); });
   jobs.push(priv("state").delete()); jobs.push(db.doc("profiles/" + ME).delete());
   jobs.forEach(function(j){ j.catch(function(){}); });
-  S = null; SAVES = []; TUNE = {w:{}, mute:[]}; SEEN = 0; N = draft();
+  S = null; SAVES = []; TUNE = {w:{}, mute:[]}; SEEN = 0; BLOCKS = []; HIDE = []; N = draft();
   ui.view = "login"; ui.stack = []; ui.tab = "home"; ui.confirm = null;
   toast("계정을 삭제했어요."); render(false);
   setTimeout(function(){ if (auth) auth.signOut(); else location.reload(); }, 1200);
@@ -1477,6 +1580,35 @@ document.addEventListener("click", function(e){
   else if (a === "songopen"){ ui.sFor = b.dataset.t; ui.sq = ""; ui.sres = []; ui.sMsg = ""; render(true); el = document.getElementById("sq"); if (el) el.focus(); }
   else if (a === "songclear"){ N.song = null; render(true); }
   else if (a === "songplay"){ songPlay(id); }
+  /* more menu: report, block, remove */
+  else if (a === "more"){ ui.sheet = {k:"post", id:id}; render(true); }
+  else if (a === "umore"){ ui.sheet = {k:"user", id:id}; render(true); }
+  else if (a === "cmore"){ ui.sheet = {k:"cmt", pid:id, cid:b.dataset.c, u:b.dataset.u}; render(true); }
+  else if (a === "s-close"){ ui.sheet = null; render(true); }
+  else if (a === "s-report"){ if (!need()) return; ui.sheet = {k:"why", t:{kind:b.dataset.kind, id:id, u:b.dataset.u, p:b.dataset.p}}; render(true); }
+  else if (a === "s-why"){
+    var rt = ui.sheet && ui.sheet.t; ui.sheet = null; if (!rt) return;
+    sendReport(rt, REASONS[+b.dataset.i] || "기타").then(function(){ toast("신고했어요. 확인한 뒤 조치하겠습니다."); live(); }, werr);
+    if (rt.kind === "post" && cur().type === "post" && cur().id === rt.id) back(); else render(true);
+  }
+  else if (a === "s-block"){ if (!need()) return; ui.sheet = {k:"sure", q:who(id).name + "님을 차단할까요? 이 사람의 글과 댓글이 내 화면에서 사라지고, 팔로우도 풀립니다.", act:"s-block-yes", yes:"차단", attrs:' data-id="' + esc(id) + '"'}; render(true); }
+  else if (a === "s-block-yes"){ blockUser(id); ui.sheet = null; toast(who(id).name + "님을 차단했어요."); var bc = cur(); if (bc.type === "post" && (getPost(bc.id) || {}).a === id) back(); else render(true); }
+  else if (a === "unblock"){ toggleOff(BLOCKS, id); savePrivate(); ui.sheet = null; toast("차단을 풀었어요."); render(true); }
+  else if (a === "s-del"){ ui.sheet = {k:"sure", q:"이 게시물을 삭제할까요? 되돌릴 수 없어요.", act:"s-del-yes", yes:"삭제", attrs:' data-id="' + id + '"'}; render(true); }
+  else if (a === "s-del-yes"){ ui.sheet = null; closeReportsFor(id); deletePost(id); toast("게시물을 삭제했어요."); if (cur().type === "post" && cur().id === id) back(); else render(true); }
+  else if (a === "s-delc"){
+    var dc = b.dataset.c; ui.sheet = null; CM[id] = (CM[id] || []).filter(function(x){ return x.id !== dc; });
+    db.doc("comments/" + dc).delete().catch(werr); closeReportsFor(dc); toast("댓글을 삭제했어요."); render(true);
+  }
+  else if (a === "reports"){ push({type:"reports"}); }
+  else if (a === "blocks"){ push({type:"blocks"}); }
+  else if (a === "r-close"){ db.doc("reports/" + id).delete().catch(werr); REPORTS = REPORTS.filter(function(r){ return r.id !== id; }); render(true); }
+  else if (a === "r-del"){
+    var rr = REPORTS.filter(function(r){ return r.id === id; })[0]; if (!rr) return;
+    if (rr.kind === "post"){ closeReportsFor(rr.target); deletePost(rr.target); toast("게시물을 삭제했어요."); }
+    else { CM[rr.pid] = (CM[rr.pid] || []).filter(function(x){ return x.id !== rr.target; }); db.doc("comments/" + rr.target).delete().catch(werr); closeReportsFor(rr.target); toast("댓글을 삭제했어요."); }
+    render(true);
+  }
   else if (a === "vload"){
     var cv = b.dataset.cv; if (!vstore || !cv || VLOAD[cv] != null) return;
     VLOAD[cv] = 0; b.disabled = true; el = document.getElementById("vl-" + cv); if (el) el.textContent = "불러오는 중 0%";
@@ -1543,7 +1675,7 @@ document.addEventListener("click", function(e){
     else { FOL.push({u:ME, t:id, at:Date.now()}); fref.set({u:ME, t:id, at:Date.now()}).catch(werr); }
     derive(); render(true);
   }
-  else if (a === "cmore"){ ui.cshow[id] = (ui.cshow[id] || CPAGE) + CPAGE; render(true); }
+  else if (a === "cshow"){ ui.cshow[id] = (ui.cshow[id] || CPAGE) + CPAGE; render(true); }
   else if (a === "cmt"){
     if (cur().type !== "post"){ ui.openC = ui.openC === id ? null : id; delete ui.cshow[id]; render(true); }
     el = document.getElementById("c-" + id); if (el) el.focus();
@@ -1678,7 +1810,7 @@ function subscribe(){
     var caps = [];
     s.docs.forEach(function(d){
       var x = clone(d.data());
-      if (d.id === "state"){ if (idle("s")){ SEEN = Math.max(SEEN, +x.seen || 0); SAVES = x.saves || []; TUNE = x.tune || {w:{}, mute:[]}; if (!TUNE.w) TUNE.w = {}; if (!TUNE.mute) TUNE.mute = []; } }
+      if (d.id === "state"){ if (idle("s")){ BLOCKS = x.blocks || []; HIDE = x.hide || []; SEEN = Math.max(SEEN, +x.seen || 0); SAVES = x.saves || []; TUNE = x.tune || {w:{}, mute:[]}; if (!TUNE.w) TUNE.w = {}; if (!TUNE.mute) TUNE.mute = []; } }
       else if (d.id.indexOf("cap_") === 0){ x.id = d.id.slice(4); if (!opening[x.id]) caps.push(x); }
     });
     CAPS = caps; if (ui.view === "app") openDue(); live();
@@ -1841,6 +1973,8 @@ function boot(){
       if (snap.exists){ S = fromPub(snap.data()); ui.mode = "edit"; ui.view = "app"; }
       else { S = null; startSignup(); }
       subscribe(); derive(); render(false);
+      /* the rules let only the person who runs the app read reports: if this read works, that is who is signed in */
+      db.collection("reports").limit(1).get().then(function(){ ui.admin = true; subReports(); live(); }, function(){});
     }, function(e){
       ui.bootMsg = "데이터베이스에 연결하지 못했어요. Firestore 데이터베이스를 만들고 규칙을 배포했는지 확인해 주세요. (" + ((e && e.code) || "알 수 없는 오류") + ")";
       ui.view = "nodb"; render(false);
