@@ -370,6 +370,12 @@ svg.i{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .npop .nt{flex:1;min-width:0;overflow-wrap:anywhere}
 .npop .nthumb{width:44px;height:44px}
 @media (prefers-reduced-motion:no-preference){.npop{animation:down .25s ease-out} @keyframes down{from{transform:translateY(-10px);opacity:0}to{transform:none;opacity:1}}}
+/* a video that is fetched only when pressed */
+.vtap{position:relative;padding:0;background:var(--stage);color:var(--tile-ink);overflow:hidden}
+.vtap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8}
+.vtapc{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:10px}
+.vtapc svg.i{width:46px;height:46px;fill:currentColor}
+.vtapc b{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--stage)}
 .robar{margin:0;padding:8px 16px;font-size:12px;background:var(--accent-soft);color:var(--ink);text-align:center}
 </style>
 
@@ -493,6 +499,8 @@ var CAPS = [];        // my locked capsules
 var LK = {}, LKAT = {}, FOL = [], CM = {};
 var MYL = [], MYF = []; // derived: posts I like, accounts I follow
 var URLS = {};        // asset id -> display url known in this view
+var vstore = null;    // optional: keeps a video as pieces inside the database when there is no file storage
+var VURL = {}, VLOAD = {}; // such videos already fetched in this view, and the ones being fetched (percent)
 var D = null;         // working copy while signing up / editing
 var N = draft();      // new post draft
 var ui = { view:"boot", mode:"signup", step:0, touched:false, tab:"home", stack:[], rootY:0, ptab:"grid", ltab:"likes", ftab:"following",
@@ -679,8 +687,13 @@ function media(p){
   if (p.media && p.media.length){
     var n = p.media.length, many = n > 1, pos = many ? Math.min(ui.car[p.id] || 0, n - 1) : 0;
     var h = '<div class="carwrap" data-car="' + p.id + '"><div class="car" tabindex="0" aria-label="사진·동영상 ' + n + '개">' + p.media.map(function(m, i){
+      if (m.k === "vid" && m.cv && !VURL[m.cv]){   /* kept as pieces in the database: fetched only when pressed */
+        var pct = VLOAD[m.cv];
+        return '<button class="vtap" data-act="vload" data-cv="' + esc(m.cv) + '" data-n="' + (+m.n || 0) + '" data-type="' + esc(m.type || "video/mp4") + '"' + (pct != null ? " disabled" : "") + ' aria-label="동영상 불러와서 보기">' +
+          (m.psrc ? '<img src="' + esc(m.psrc) + '" alt="">' : "") + '<span class="vtapc">' + I.play + '<b id="vl-' + esc(m.cv) + '">' + (pct != null ? "불러오는 중 " + pct + "%" : "동영상 보기" + (m.size ? " · " + mb(+m.size) : "")) + "</b></span></button>";
+      }
       return m.k === "vid"
-        ? '<video src="' + esc(src(m)) + '"' + (m.poster ? ' poster="' + esc(psrc(m)) + '"' : "") + ' controls playsinline preload="metadata" aria-label="동영상 ' + (i + 1) + '"></video>'
+        ? '<video src="' + esc(m.cv ? VURL[m.cv] : src(m)) + '"' + (m.cv ? ' data-cv="' + esc(m.cv) + '"' : "") + (m.poster || m.psrc ? ' poster="' + esc(psrc(m)) + '"' : "") + ' controls playsinline preload="metadata" aria-label="동영상 ' + (i + 1) + '"></video>'
         : '<img src="' + esc(src(m)) + '" alt="사진 ' + (i + 1) + '">'; }).join("") + "</div>" +
       (many ? '<button class="cnav prev" data-act="car" data-d="-1" aria-label="이전"' + (pos === 0 ? " hidden" : "") + ">" + I.back + "</button>" +
               '<button class="cnav next" data-act="car" data-d="1" aria-label="다음"' + (pos === n - 1 ? " hidden" : "") + ">" + I.back + "</button>" +
@@ -740,7 +753,7 @@ function gridTile(p, o){
   var sz = o.layout && o.layout.size && o.layout.size[p.id] ? " s" + o.layout.size[p.id] : "";
   var act = o.edit ? 'data-act="gsel" aria-pressed="' + (ui.gsel === p.id) + '"' : 'data-act="post"';
   if (p.media && p.media.length){
-    var m = p.media[0], pic = m.k === "vid" ? (m.poster ? '<img src="' + esc(psrc(m)) + '" alt="" loading="lazy">' : '<video src="' + esc(src(m)) + '" muted playsinline preload="metadata"></video>')
+    var m = p.media[0], pic = m.k === "vid" ? (m.poster || m.psrc ? '<img src="' + esc(psrc(m)) + '" alt="" loading="lazy">' : (m.cv ? "" : '<video src="' + esc(src(m)) + '" muted playsinline preload="metadata"></video>'))
                                              : '<img src="' + esc(src(m)) + '" alt="" loading="lazy">';
     return '<button class="gt' + sz + '" ' + act + ' data-id="' + p.id + '" aria-label="' + label + '">' + pic +
       (m.k === "vid" ? '<span class="vbadge">' + I.play + "</span>" : "") + (p.media.length > 1 ? '<span class="multi">' + p.media.length + "</span>" : "") + "</button>";
@@ -766,7 +779,7 @@ function unread(){ return notifs().filter(function(p){ return ptime(p) > SEEN; }
 function thumbHTML(p){
   var m = p.media && p.media[0];
   if (!m) return "";
-  if (m.k === "vid") return m.poster ? '<img src="' + esc(psrc(m)) + '" alt="">' : I.play;
+  if (m.k === "vid") return m.poster || m.psrc ? '<img src="' + esc(psrc(m)) + '" alt="">' : I.play;
   return '<img src="' + esc(src(m)) + '" alt="">';
 }
 function notifLine(p){ return "<b>" + esc(who(p.a).name) + "</b>님이 새로운 게시물을 올렸어요. 어서 확인해 보세요!"; }
@@ -970,7 +983,7 @@ function searchHTML(){
     '<div id="results">' + searchResults() + "</div>";
 }
 function newHTML(){
-  var canVideo = !!assets;
+  var canVideo = !!assets || !!vstore;
   var h = '<div class="group"><h2 class="h3">사진·동영상 ' + N.items.length + "/" + MAX_ITEMS + '</h2><div class="thumbs">' +
     N.items.map(function(it, i){
       return '<div class="thumb">' + (it.k === "vid" ? '<video src="' + esc(it.url) + '" muted playsinline preload="metadata"></video><span class="vbadge">' + I.play + "</span>" : '<img src="' + esc(it.url) + '" alt="고른 사진 ' + (i + 1) + '">') +
@@ -1291,6 +1304,8 @@ function posterOf(url){
     try{ v.load(); }catch(e){ fin(); }
   });
 }
+function blobData(b){ return new Promise(function(res, rej){ var fr = new FileReader(); fr.onload = function(){ res(fr.result); }; fr.onerror = rej; fr.readAsDataURL(b); }); }
+function mb(n){ return n >= 1048576 ? (Math.round(n / 104857.6) / 10) + "MB" : Math.max(1, Math.round(n / 1024)) + "KB"; }
 function videoType(file){
   var t = (file.type || "").toLowerCase(), n = (file.name || "").toLowerCase();
   if (t === "video/mp4" || t === "video/webm") return t;
@@ -1304,11 +1319,15 @@ function addFiles(files){
     if (/^image\//.test(f.type)) return shrink(f, assets ? 1080 : DATA_PX, assets ? 0.85 : DATA_Q, !assets).then(function(r){ r.k = "img"; return r; }, function(){ msg = "읽지 못한 사진이 있어요. 다른 파일로 다시 시도하세요."; return null; });
     var vt = videoType(f);
     if (!vt && !/^video\//.test(f.type)){ msg = "사진이나 동영상 파일만 올릴 수 있어요."; return Promise.resolve(null); }
-    if (!assets){ msg = "지금 설정에서는 사진만 올릴 수 있어요."; return Promise.resolve(null); }
+    if (!assets && !vstore){ msg = "지금 설정에서는 사진만 올릴 수 있어요."; return Promise.resolve(null); }
     if (!vt){ msg = "이 동영상 형식은 올릴 수 없어요. MP4나 MOV 파일을 써 주세요."; return Promise.resolve(null); }
     if (f.size > VIDEO_MAX){ msg = "동영상은 20MB까지 올릴 수 있어요. 더 짧게 잘라서 올려 주세요."; return Promise.resolve(null); }
     var url = URL.createObjectURL(f);
-    return posterOf(url).then(function(b){ return {k:"vid", file:f, type:vt, url:url, poster:b}; });
+    return posterOf(url).then(function(b){
+      var it = {k:"vid", file:f, type:vt, url:url, poster:b};
+      if (assets || !b) return it;
+      return blobData(b).then(function(d){ it.pdata = d; return it; }, function(){ return it; });   /* no file storage: the still frame travels inside the post */
+    });
   });
   return Promise.all(jobs).then(function(rs){
     N.items = N.items.concat(rs.filter(Boolean)).slice(0, MAX_ITEMS);
@@ -1323,7 +1342,10 @@ function uploadAll(items){
     if (i >= items.length) return Promise.resolve(out);
     var it = items[i], job;
     setProg("올리는 중 " + (i + 1) + "/" + items.length);
-    if (!assets) job = Promise.resolve({k:"img", src:it.data});
+    if (!assets) job = it.k === "vid"
+      ? vstore.put(it.file, it.type, function(d, n){ setProg("동영상 올리는 중 " + Math.round(d / n * 100) + "%"); }).then(function(r){
+          var m = {k:"vid", cv:r.id, n:r.n, type:it.type, size:it.file.size}; if (it.pdata) m.psrc = it.pdata; return m; })
+      : Promise.resolve({k:"img", src:it.data});
     else if (it.k === "img") job = assets.upload(it.blob, {type:"image/jpeg"}).then(function(r){ return kept({k:"img"}, r); });
     else job = assets.upload(it.file, {type:it.type}).then(function(r){
       var m = kept({k:"vid"}, r);
@@ -1340,6 +1362,8 @@ function uploadMsg(e){
   if (c === "unsupported_type") return "이 파일 형식은 올릴 수 없어요. 동영상은 MP4나 MOV로 올려 주세요.";
   if (c === "quota_or_state" || c === "quota_exceeded") return "저장 공간이 가득 찼어요. 예전 게시물을 지운 뒤 다시 시도하세요.";
   if (c === "rate_limited" || c === "resource_exhausted") return "잠시 뒤에 다시 올려 주세요.";
+  if (c === "resource-exhausted") return "오늘 올릴 수 있는 양을 다 썼어요. 내일 다시 올려 주세요.";
+  if (c === "permission-denied") return "올릴 권한이 없어요. 로그인 상태를 확인해 주세요.";
   if (c === "no_storage") return "사진·동영상 저장소가 켜져 있지 않아요. 설정 안내의 Storage 단계를 확인해 주세요.";
   if (c === "doc_too_big") return "사진 용량이 커서 올리지 못했어요. 사진 수를 줄여 주세요.";
   if (c === "not_granted" || c === "invalid_argument") return "이 계정으로는 올릴 수 없어요. 앱 주인의 초대가 필요합니다.";
@@ -1350,7 +1374,7 @@ function publish(){
   if (!N.items.length){ toast("사진이나 동영상을 1개 이상 고르세요."); render(true); return; }
   var openAt = 0;
   if (N.cap){ openAt = capDate(); if (!openAt){ toast("타임캡슐을 열 날짜를 내일 이후로 고르세요."); render(true); return; } }
-  if (!assets && N.items.reduce(function(n, it){ return n + (it.data || "").length; }, 0) > DATA_MAX){ toast(uploadMsg({code:"doc_too_big"})); render(true); return; }
+  if (!assets && N.items.reduce(function(n, it){ return n + (it.data || "").length + (it.pdata || "").length; }, 0) > DATA_MAX){ toast(uploadMsg({code:"doc_too_big"})); render(true); return; }
   ui.busy = true; ui.prog = "올리는 중…"; render(true);
   var id = "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   uploadAll(N.items).then(function(mediaArr){
@@ -1368,6 +1392,7 @@ function deletePost(id){
   var r = RP.filter(function(x){ return x.id === id; })[0];
   db.doc("posts/" + id).delete().catch(werr);
   if (r && assets) (r.media || []).forEach(function(m){ if (m.id) assets.delete(m.id).catch(function(){}); if (m.poster) assets.delete(m.poster).catch(function(){}); });
+  if (r && vstore) (r.media || []).forEach(function(m){ if (m.cv) vstore.remove(m.cv, +m.n || 0); });
   (CM[id] || []).forEach(function(c){ if (c.id.indexOf("tmp") !== 0) db.doc("comments/" + c.id).delete().catch(function(){}); });
   (LK[id] || []).forEach(function(u){ db.doc("likes/" + id + "~" + u).delete().catch(function(){}); });
   RP = RP.filter(function(x){ return x.id !== id; });
@@ -1452,6 +1477,16 @@ document.addEventListener("click", function(e){
   else if (a === "songopen"){ ui.sFor = b.dataset.t; ui.sq = ""; ui.sres = []; ui.sMsg = ""; render(true); el = document.getElementById("sq"); if (el) el.focus(); }
   else if (a === "songclear"){ N.song = null; render(true); }
   else if (a === "songplay"){ songPlay(id); }
+  else if (a === "vload"){
+    var cv = b.dataset.cv; if (!vstore || !cv || VLOAD[cv] != null) return;
+    VLOAD[cv] = 0; b.disabled = true; el = document.getElementById("vl-" + cv); if (el) el.textContent = "불러오는 중 0%";
+    vstore.get(cv, +b.dataset.n || 0, b.dataset.type, function(d, n){
+      VLOAD[cv] = Math.round(d / n * 100); var lab = document.getElementById("vl-" + cv); if (lab) lab.textContent = "불러오는 중 " + VLOAD[cv] + "%";
+    }).then(function(blob){
+      VURL[cv] = URL.createObjectURL(blob); delete VLOAD[cv]; render(true);
+      var v = app.querySelector('video[data-cv="' + cv + '"]'); if (v){ var pr = v.play(); if (pr && pr.catch) pr.catch(function(){}); }
+    }, function(){ delete VLOAD[cv]; toast("동영상을 불러오지 못했어요. 다시 눌러 주세요."); render(true); });
+  }
   else if (a === "songpick"){
     var sg = ui.sres[+b.dataset.i]; if (!sg) return;
     if (ui.sFor === "note"){ ui.nd.song = Array.from(sg.t + (sg.a ? " - " + sg.a : "")).slice(0, 40).join(""); ui.nd.via = ""; }
@@ -1619,7 +1654,7 @@ function subscribe(){
     live();
   }, serr);
   db.collection("posts").orderBy("at", "desc").limit(300).onSnapshot(function(s){
-    RP = s.docs.map(function(d){ var x = clone(d.data()); x.id = d.id; return x; });
+    RP = s.docs.filter(function(d){ var x = d.data(); return x && x.kind !== "chunk" && x.uid; }).map(function(d){ var x = clone(d.data()); x.id = d.id; return x; });
     var prev = KNOWN; KNOWN = {};
     RP.forEach(function(r){ KNOWN[r.id] = 1; });
     if (prev){ derive(); var fresh = notifs().filter(function(p){ return !prev[p.id]; }); if (fresh.length) showPop(fresh[0].id); }
@@ -1723,6 +1758,40 @@ function installHTML(){
 }
 /* the browser can say "installable" a moment after the page is drawn: redraw so the button replaces the hint */
 window.INSTALL_READY = function(){ if (ui.view === "login" || ui.view === "nodb") render(false); else soft(); };
+/* Videos without file storage: the file is cut into pieces under 1MB and each piece is one small
+   database record beside the posts (marked kind:"chunk", no "at", so the feed never lists it).
+   Watching fetches the pieces and joins them again. Fine for short clips; not a streaming service. */
+function chunkStore(){
+  var SIZE = window.CHUNK_SIZE || 900 * 1024;
+  function ref(id, i){ return db.doc("posts/" + id + "_c" + i); }
+  return {
+    put:function(file, type, onStep){
+      var id = "v" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8), n = Math.max(1, Math.ceil(file.size / SIZE)), i = 0;
+      function next(){
+        if (i >= n) return Promise.resolve({id:id, n:n});
+        return file.slice(i * SIZE, (i + 1) * SIZE).arrayBuffer().then(function(buf){
+          return ref(id, i).set({uid:ME, kind:"chunk", of:id, i:i, b:firebase.firestore.Blob.fromUint8Array(new Uint8Array(buf))});
+        }).then(function(){ i++; if (onStep) onStep(i, n); return next(); });
+      }
+      return next().catch(function(e){ for (var k = 0; k <= i && k < n; k++) ref(id, k).delete().catch(function(){}); throw e; });
+    },
+    get:function(id, n, type, onStep){
+      var parts = new Array(n), done = 0, idx = 0;
+      function worker(){
+        if (idx >= n) return Promise.resolve();
+        var k = idx++;
+        return ref(id, k).get().then(function(sn){
+          if (!sn.exists) throw {code:"missing"};
+          parts[k] = sn.data().b.toUint8Array(); done++; if (onStep) onStep(done, n);
+          return worker();
+        });
+      }
+      if (!n) return Promise.reject({code:"missing"});
+      return Promise.all([worker(), worker(), worker(), worker()]).then(function(){ return new Blob(parts, {type:type || "video/mp4"}); });
+    },
+    remove:function(id, n){ for (var k = 0; k < n; k++) ref(id, k).delete().catch(function(){}); }
+  };
+}
 function startSignup(){
   D = blank();
   if (GU){
@@ -1766,7 +1835,8 @@ function boot(){
     if (booted) return;
     booted = true; GU = u; ME = u.uid; ui.ro = false; ui.busy = false;
     try{ assets = USE_STORAGE && firebase.storage ? storageAssets(firebase.storage()) : null; }catch(e){ assets = null; }
-    var np = document.getElementById("np"); if (np) np.accept = assets ? "image/*,video/*" : "image/*";
+    vstore = firebase.firestore.Blob ? chunkStore() : null;
+    var np = document.getElementById("np"); if (np) np.accept = assets || vstore ? "image/*,video/*" : "image/*";
     db.doc("profiles/" + ME).get().then(function(snap){
       if (snap.exists){ S = fromPub(snap.data()); ui.mode = "edit"; ui.view = "app"; }
       else { S = null; startSignup(); }
