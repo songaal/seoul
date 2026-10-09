@@ -415,53 +415,9 @@ var FIELDS = [
 var FBY = {}; FIELDS.forEach(function(f){ FBY[f.id] = f; });
 
 /* Example accounts and posts so the screens are not empty. All of them are made up. */
-var AUTHORS = [
-  {id:"a1",  name:"달리는곰",   f:"soccer", bio:"일요일 아침마다 풋살. 포지션은 왼쪽 윙."},
-  {id:"a2",  name:"제주바람",   f:"travel", bio:"제주 한 달 살이 3회차. 걷는 여행을 좋아해요."},
-  {id:"a3",  name:"픽셀러",     f:"game",   bio:"엔딩 볼 때까지 안 자는 편."},
-  {id:"a4",  name:"밤운전",     f:"car",    bio:"퇴근 후 한 바퀴. 드라이브 코스를 기록합니다."},
-  {id:"a5",  name:"엘피수집가", f:"music",  bio:"주말마다 중고 음반 가게를 돕니다."},
-  {id:"a6",  name:"냄비요정",   f:"food",   bio:"10분 안에 끝나는 집밥만 올려요."},
-  {id:"a7",  name:"노을채집",   f:"photo",  bio:"매일 같은 자리에서 하늘을 찍습니다."},
-  {id:"a8",  name:"소파지박령", f:"movie",  bio:"주말은 정주행으로 씁니다."},
-  {id:"a9",  name:"새벽러너",   f:"fit",    bio:"새벽 6시 한강. 느리게 오래 뜁니다."},
-  {id:"a10", name:"세미콜론",   f:"code",   bio:"퇴근 후 사이드 프로젝트를 만드는 개발자."},
-  {id:"a11", name:"여섯평",     f:"home",   bio:"여섯 평 자취방을 고쳐 쓰는 기록."},
-  {id:"a12", name:"콩이누나",   f:"pet",    bio:"말티즈 콩이와 산책하는 일상."},
-  {id:"a13", name:"밑줄긋는밤", f:"book",   bio:"지하철에서 읽고 밑줄 긋는 사람."},
-  {id:"a14", name:"구제왕",     f:"style",  bio:"동묘와 광장시장에서 옷을 건집니다."}
-];
+var AUTHORS = [];
 var ABY = {}; AUTHORS.forEach(function(a){ ABY[a.id] = a; });
-var POSTS = [
-  ["a1","#주말풋살","일요일 아침 6대6. 후반에 겨우 역전했다."],
-  ["a2","#제주도여행","제주도 여행 🌊 협재에서 해 질 때까지 앉아 있었음."],
-  ["a3","#오늘의플레이","3일 걸린 보스 드디어 클리어. 공략은 댓글에."],
-  ["a4","#드라이브코스","북악스카이웨이 야경. 창문 내리고 한 바퀴."],
-  ["a5","#이번주노래","이번 주 내내 이 앨범만 돌렸다. B면 2번 트랙이 최고."],
-  ["a6","#집밥기록","🍳 10분 계란볶음밥. 파기름을 먼저 내는 게 전부."],
-  ["a7","#오늘의하늘","🌅 퇴근길 한강. 오늘 하늘은 분홍색이었다."],
-  ["a8","#정주행","주말에 시즌 하나를 끝냈다. 마지막 화는 말을 아끼겠음."],
-  ["a9","#러닝기록","5km 28분. 지난달보다 2분 줄었다."],
-  ["a10","#사이드프로젝트","💻 주말 동안 가계부 앱 첫 화면을 붙였다."],
-  ["a11","#자취방","🏠 조명 하나 바꿨는데 방이 달라 보인다."],
-  ["a12","#우리집강아지","산책 가자는 말에 이미 문 앞에 가 있는 콩이."],
-  ["a13","#독서기록","출퇴근 지하철에서 한 권 완독. 밑줄이 마흔 개."],
-  ["a14","#오늘의코디","동묘에서 건진 코듀로이 재킷. 만 원."],
-  ["a1","#직관인증","⚽ 원정 직관 다녀왔다. 목이 다 쉬었음."],
-  ["a2","#주말여행","지난 주말 부산 당일치기. KTX 첫차를 타면 충분하다."],
-  ["a3","#게임추천","혼자 만든 게임이라는데 완성도가 놀랍다. 3시간이면 엔딩."],
-  ["a4","#내차소개","10만 km 찍은 기념으로 셀프 세차."],
-  ["a5","#플레이리스트","비 오는 날 듣는 12곡 정리."],
-  ["a6","#오늘뭐먹지","🍕 냉장고 털어 만든 또띠아 피자."],
-  ["a7","#필름사진","첫 롤 현상했다. 36장 중 건진 건 4장."],
-  ["a8","#영화추천","러닝타임 90분짜리 영화가 제일 좋다. 이번 주 한 편."],
-  ["a9","#오운완","비가 와서 실내 자전거 40분."],
-  ["a10","#개발일기","버그 원인은 오타 한 글자였다. 세 시간 걸림."],
-  ["a11","#방꾸미기","선반을 달았다. 수평 맞추는 데 한 시간."],
-  ["a12","#우리집강아지","목욕 후 삐진 콩이. 간식으로 화해함."],
-  ["a13","#책추천","얇은데 오래 남는 에세이 한 권."],
-  ["a14","#빈티지","20년 된 청바지 밑단 수선 완료."]
-].map(function(r, i){ return {id:"p" + (i + 1), a:r[0], tag:r[1], t:r[2], v:i >= 14 ? 1 : 0}; });
+var POSTS = [].map(function(r, i){ return {id:"p" + (i + 1), a:r[0], tag:r[1], t:r[2], v:i >= 14 ? 1 : 0}; });
 var PBY = {}; POSTS.forEach(function(p){ PBY[p.id] = p; });
 var TAKEN = {}; AUTHORS.forEach(function(a){ TAKEN[a.name.toLowerCase()] = 1; });
 ["admin","운영자","seoul","서울"].forEach(function(n){ TAKEN[n] = 1; });
@@ -646,6 +602,10 @@ function tw(f){ var v = TUNE.w[f]; return v == null ? 2 : v; }
 function mutedPost(p){ var s = (p.t + " " + p.tag + " " + who(p.a).name).toLowerCase(); return TUNE.mute.some(function(k){ return s.indexOf(k.toLowerCase()) !== -1; }); }
 function passes(q){ return (!q.f || tw(q.f) > 0) && !mutedPost(q); }
 function shownCount(){ return POSTS.filter(function(p){ return passes(exPost(p)); }).length; }
+function tuneTotals(){
+  var real = RP.map(realPost).filter(function(p){ return !p.mine; });
+  return {total:POSTS.length + real.length, shown:shownCount() + real.filter(passes).length};
+}
 function feed(all){
   var ex = POSTS.map(function(p, i){
     var q = exPost(p);
@@ -848,11 +808,14 @@ function stripItem(a){
     ring(av(a.id, 56), has(MYF, a.id)) + '<span class="lbl">' + esc(a.name) + "</span></button>";
 }
 function homeHTML(){
-  var nt = noteOf(S), hidden = POSTS.length - shownCount(), realN = RP.length;
+  var nt = noteOf(S), tt = tuneTotals(), hidden = tt.total - tt.shown, realN = RP.length, fd = feed();
   var h = '<div class="strip line" aria-label="노트와 계정"><button class="me" data-act="note"><span class="bub"><span>' + (nt ? esc(noteText(nt)) : "+ 노트") + "</span></span>" + ring(avatar(S, 56), true) + '<span class="lbl">내 노트</span></button>' +
     people().map(stripItem).join("") + "</div>";
-  h += '<div class="feed">' + feed().map(function(p){ return postCard(p, false); }).join("") + "</div>";
-  h += '<p class="note">' + (realN ? "사람들이 올린 게시물 아래는 예시 게시물입니다." : "아직 올라온 게시물이 없어서 예시 게시물을 보여 드려요.") + (hidden ? " 추천 조절로 예시 " + hidden + "개를 숨겼습니다." : "") + "</p>";
+  h += fd.length ? '<div class="feed">' + fd.map(function(p){ return postCard(p, false); }).join("") + "</div>"
+                 : '<div class="empty"><b>아직 올라온 게시물이 없어요</b><span>' + (hidden ? "추천 조절로 숨긴 게시물만 있어요." : "첫 게시물을 올려 보세요. 다른 사람이 올리면 여기에 바로 나타납니다.") + "</span>" +
+                   (ui.ro ? "" : '<button class="btn small" data-act="tab" data-t="new">게시물 올리기</button>') + "</div>";
+  var foot = (POSTS.length ? (realN ? "사람들이 올린 게시물 아래는 예시 게시물입니다." : "아직 올라온 게시물이 없어서 예시 게시물을 보여 드려요.") : "") + (hidden && fd.length ? " 추천 조절로 " + hidden + "개를 숨겼습니다." : "");
+  if (foot) h += '<p class="note">' + foot + "</p>";
   return h;
 }
 function profileHTML(id){
@@ -914,7 +877,8 @@ function searchResults(){
   var inField = function(a){ return f === "all" || (a.real ? has((PROF[a.id] || {}).fields || [], f) : a.f === f); };
   var ppl = people().filter(function(a){ return inField(a) && (hit(a.name) || hit(a.bio)); });
   var posts = feed(true).filter(function(p){ return (f === "all" || p.f === f) && (hit(p.t) || hit(p.tag) || hit(who(p.a).name) || (p.f && hit(FBY[p.f].name))); });
-  if (!ppl.length && !posts.length) return '<div class="empty"><b>검색 결과가 없어요</b><span>다른 낱말이나 분야로 찾아 보세요.</span></div>';
+  if (!ppl.length && !posts.length) return !q && f === "all" ? '<div class="empty"><b>아직 계정이나 게시물이 없어요</b><span>사람들이 가입하고 글을 올리면 여기서 찾을 수 있습니다.</span></div>'
+                                                             : '<div class="empty"><b>검색 결과가 없어요</b><span>다른 낱말이나 분야로 찾아 보세요.</span></div>';
   var h = "";
   if (ppl.length) h += '<div class="group"><h2 class="h3 pad">계정</h2><div class="ulist">' + ppl.slice(0, q || f !== "all" ? 30 : 5).map(userRow).join("") + "</div></div>";
   if (posts.length) h += '<div class="group" style="margin-top:14px"><h2 class="h3 pad">게시물</h2>' + grid(posts) + "</div>";
@@ -1062,10 +1026,10 @@ function fromSpotify(){
   }, function(e){ ui.spBusy = false; ui.spMsg = spotifyMsg(e); if (cur().type === "note") render(true); });
 }
 function likesHTML(){
-  var likes = ui.ltab === "likes", ids = (likes ? MYL : SAVES).slice().reverse();
-  var posts = ids.map(getPost).filter(Boolean);
-  var h = '<div class="ptabs" role="tablist" style="border-top:0"><button role="tab" data-act="ltab" data-t="likes" aria-selected="' + likes + '">좋아요 ' + MYL.length + "</button>" +
-          '<button role="tab" data-act="ltab" data-t="saves" aria-selected="' + !likes + '">저장 ' + SAVES.length + "</button></div>";
+  var likes = ui.ltab === "likes", lp = MYL.slice().reverse().map(getPost).filter(Boolean), sp = SAVES.slice().reverse().map(getPost).filter(Boolean);
+  var posts = likes ? lp : sp;
+  var h = '<div class="ptabs" role="tablist" style="border-top:0"><button role="tab" data-act="ltab" data-t="likes" aria-selected="' + likes + '">좋아요 ' + lp.length + "</button>" +
+          '<button role="tab" data-act="ltab" data-t="saves" aria-selected="' + !likes + '">저장 ' + sp.length + "</button></div>";
   h += posts.length ? grid(posts) : '<div class="empty"><b>' + (likes ? "좋아요를 누른 게시물이 없어요" : "저장한 게시물이 없어요") + "</b><span>" +
        (likes ? "게시물의 하트를 누르면 여기에 모입니다." : "게시물의 책갈피를 누르면 여기에 모입니다.") + '</span><button class="btn small" data-act="tab" data-t="home">홈으로 가기</button></div>';
   return h;
@@ -1091,7 +1055,11 @@ function followsHTML(){
     '<div class="pad"><input class="input sm" id="fq" type="search" placeholder="계정 검색" aria-label="계정 검색" autocomplete="off" value="' + esc(ui.fq) + '"></div>' +
     '<div id="flist">' + followList() + "</div>";
 }
-function tuneCount(){ return "예시 게시물 " + POSTS.length + "개 중 " + shownCount() + "개가 홈에 나옵니다. 사람들이 올린 글에도 같은 조절이 적용돼요."; }
+function tuneCount(){
+  var tt = tuneTotals();
+  if (!tt.total) return "아직 다른 사람이 올린 게시물이 없어요. 글이 올라오면 여기서 고른 대로 걸러집니다.";
+  return (POSTS.length ? "예시와 다른 사람이 올린 게시물 " : "다른 사람이 올린 게시물 ") + tt.total + "개 중 " + tt.shown + "개가 홈에 나옵니다.";
+}
 function tuneHTML(){
   var order = S.fields.map(function(id){ return FBY[id]; }).concat(FIELDS.filter(function(f){ return !has(S.fields, f.id); }));
   var h = '<div class="pad"><p class="panel" id="tcount" role="status">' + tuneCount() + "</p></div>";
@@ -1571,11 +1539,11 @@ function subscribe(){
   }, serr);
   db.collection("likes").limit(1000).onSnapshot(function(s){
     var lk = {}, at = {};
-    s.docs.forEach(function(d){ var x = d.data(); if (!x.p || !x.u) return; (lk[x.p] = lk[x.p] || []).push(x.u); if (x.u === ME) at[x.p] = x.at || 0; });
+    s.docs.forEach(function(d){ var x = d.data(); if (!x.p || !x.u || (/^p\d+$/.test(x.p) && !PBY[x.p])) return; (lk[x.p] = lk[x.p] || []).push(x.u); if (x.u === ME) at[x.p] = x.at || 0; });
     LK = lk; LKAT = at; live();
   }, serr);
   db.collection("follows").limit(1000).onSnapshot(function(s){
-    FOL = s.docs.map(function(d){ var x = d.data(); return {u:x.u, t:x.t}; }).filter(function(x){ return x.u && x.t; }); live();
+    FOL = s.docs.map(function(d){ var x = d.data(); return {u:x.u, t:x.t}; }).filter(function(x){ return x.u && x.t && !(/^a\d+$/.test(x.t) && !ABY[x.t]); }); live();
   }, serr);
   db.collection("comments").limit(1000).onSnapshot(function(s){
     var cm = {};
