@@ -398,7 +398,7 @@ var USE_STORAGE = false;
 /* 앱으로 설치: 브라우저가 설치할 수 있다고 알려 주면 그 순간을 붙잡아 두었다가, 설치 버튼을 누를 때 씁니다. */
 (function(){
   var deferred = null;
-  window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred = e; });
+  window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred = e; if (window.INSTALL_READY) window.INSTALL_READY(); });
   window.addEventListener("appinstalled", function(){ deferred = null; });
   window.INSTALL = {
     standalone: function(){ return (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true; },
@@ -1721,6 +1721,8 @@ function installHTML(){
   if (it.ios()) return '<p class="muted small">아이폰에 앱으로 넣으려면 Safari 아래쪽 공유 버튼을 누르고 홈 화면에 추가를 고르세요.</p>';
   return '<p class="muted small">앱으로 넣으려면 브라우저 메뉴에서 홈 화면에 추가 또는 앱 설치를 고르세요.</p>';
 }
+/* the browser can say "installable" a moment after the page is drawn: redraw so the button replaces the hint */
+window.INSTALL_READY = function(){ if (ui.view === "login" || ui.view === "nodb") render(false); else soft(); };
 function startSignup(){
   D = blank();
   if (GU){
