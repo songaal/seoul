@@ -343,6 +343,23 @@ svg.i{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .srow:hover{background:var(--surface-2)}
 .srow b{display:block;font-size:14px;overflow-wrap:anywhere}
 .srow small{display:block;color:var(--ink-2);font-size:12px;overflow-wrap:anywhere}
+/* notifications */
+.topacts{display:flex;align-items:center}
+.nbell{position:relative}
+.ndot{position:absolute;top:3px;right:1px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.nlist{display:flex;flex-direction:column}
+.nrow{display:flex;align-items:center;gap:12px;padding:10px 16px}
+.nrow.new{background:var(--accent-soft)}
+.ntext{flex:1;min-width:0;text-align:left;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.ntext small{display:block;color:var(--ink-2);font-size:12px;margin-top:2px}
+.nthumb{flex:none;width:52px;height:52px;border-radius:10px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;color:var(--ink-2)}
+.nthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.nthumb svg.i{width:20px;height:20px;fill:currentColor}
+.npop{position:absolute;left:12px;right:12px;top:64px;z-index:6;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:var(--shadow);text-align:left;font-size:14px;line-height:1.4}
+.npop .av{--s:36px}
+.npop .nt{flex:1;min-width:0;overflow-wrap:anywhere}
+.npop .nthumb{width:44px;height:44px}
+@media (prefers-reduced-motion:no-preference){.npop{animation:down .25s ease-out} @keyframes down{from{transform:translateY(-10px);opacity:0}to{transform:none;opacity:1}}}
 .robar{margin:0;padding:8px 16px;font-size:12px;background:var(--accent-soft);color:var(--ink);text-align:center}
 </style>
 
@@ -444,6 +461,8 @@ var db = null, userApi = null, assets = null, mcpApi = null, sampleApi = null;
 var ME = "guest";     // my id on this artifact
 var S = null;         // my public profile
 var SAVES = [], TUNE = {w:{}, mute:[]};
+var SEEN = 0;         // when I last opened my notifications
+var KNOWN = null;     // post ids already delivered, to spot a new one arriving
 var PROF = {};        // uid -> public profile
 var RP = [];          // real posts
 var CAPS = [];        // my locked capsules
@@ -453,9 +472,9 @@ var URLS = {};        // asset id -> display url known in this view
 var D = null;         // working copy while signing up / editing
 var N = draft();      // new post draft
 var ui = { view:"boot", mode:"signup", step:0, touched:false, tab:"home", stack:[], rootY:0, ptab:"grid", ltab:"likes", ftab:"following",
-           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null };
+           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0 };
 var app = document.getElementById("app");
-var toastTimer = null, liveTimer = null, wq = {}, opening = {};
+var toastTimer = null, liveTimer = null, popTimer = null, wq = {}, opening = {};
 
 /* ---------- helpers ---------- */
 function ls(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
@@ -501,6 +520,7 @@ var I = {
   grid:   ico('<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16"/>'),
   tune:   ico('<path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/>'),
   clock:  ico('<circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/>'),
+  bell:   ico('<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/>'),
   lock:   ico('<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>'),
   stop:   ico('<rect x="7" y="7" width="10" height="10" rx="1.5"/>'),
   play:   ico('<path d="M8 5.5v13l11-6.5z"/>'),
@@ -536,7 +556,7 @@ function put(key, ref, dataFn){
 }
 function idle(key){ var q = wq[key]; return !q || (!q.busy && !q.dirty); }
 function saveProfile(){ if (ui.ro || !S) return; put("p", db.doc("profiles/" + ME), function(){ return clone(S); }); }
-function savePrivate(){ if (ui.ro) return; put("s", priv("state"), function(){ return {saves:SAVES.slice(), tune:clone(TUNE)}; }); }
+function savePrivate(){ if (ui.ro) return; put("s", priv("state"), function(){ return {saves:SAVES.slice(), tune:clone(TUNE), seen:SEEN}; }); }
 
 /* ---------- people ---------- */
 function who(id){
@@ -708,6 +728,39 @@ function grid(list, o){ return '<div class="gwrap"><div class="grid3">' + list.m
 function userRow(a){
   return '<div class="urow"><button class="who" data-act="user" data-id="' + esc(a.id) + '">' + ring(av(a.id, 46), has(MYF, a.id)) +
     '<span class="wt"><b>' + esc(a.name) + "</b><small>" + esc(a.bio || "") + "</small></span></button>" + (a.me ? "" : followBtn(a.id)) + "</div>";
+}
+
+/* ---------- notifications: someone I follow posted after I followed them ---------- */
+function ptime(p){ return p.openedAt || p.at || 0; }
+function notifs(){
+  var since = {};
+  FOL.forEach(function(x){ if (x.u === ME) since[x.t] = x.at || 0; });
+  return RP.map(realPost).filter(function(p){ return !p.mine && since[p.a] != null && ptime(p) >= since[p.a]; })
+    .sort(function(a, b){ return ptime(b) - ptime(a); }).slice(0, 30);
+}
+function unread(){ return notifs().filter(function(p){ return ptime(p) > SEEN; }).length; }
+function thumbHTML(p){
+  var m = p.media && p.media[0];
+  if (!m) return "";
+  if (m.k === "vid") return m.poster ? '<img src="' + esc(psrc(m)) + '" alt="">' : I.play;
+  return '<img src="' + esc(src(m)) + '" alt="">';
+}
+function notifLine(p){ return "<b>" + esc(who(p.a).name) + "</b>님이 새로운 게시물을 올렸어요. 어서 확인해 보세요!"; }
+function notifHTML(){
+  var list = notifs();
+  if (!list.length) return '<div class="empty"><b>아직 알림이 없어요</b><span>팔로우한 사람이 새 게시물을 올리면 여기에 알려 드려요.</span><button class="btn small" data-act="tab" data-t="search">사람 찾아보기</button></div>';
+  return '<div class="nlist">' + list.map(function(p){
+    return '<div class="nrow' + (ptime(p) > ui.nseen ? " new" : "") + '"><button class="cav" data-act="user" data-id="' + esc(p.a) + '" aria-label="' + esc(who(p.a).name) + ' 프로필 보기">' + av(p.a, 40) + "</button>" +
+      '<button class="ntext" data-act="post" data-id="' + p.id + '"><span>' + notifLine(p) + "</span><small>" + ago(ptime(p)) + "</small></button>" +
+      '<button class="nthumb" data-act="post" data-id="' + p.id + '" aria-label="게시물 보기">' + thumbHTML(p) + "</button></div>"; }).join("") + "</div>";
+}
+function popHTML(){
+  var p = ui.pop && getPost(ui.pop); if (!p) return "";
+  return '<button class="npop" data-act="post" data-id="' + p.id + '">' + av(p.a, 36) + '<span class="nt">' + notifLine(p) + '</span><span class="nthumb">' + thumbHTML(p) + "</span></button>";
+}
+function showPop(id){
+  ui.pop = id; clearTimeout(popTimer);
+  popTimer = setTimeout(function(){ ui.pop = null; var e = app.querySelector(".npop"); if (e) e.remove(); }, 7000);
 }
 
 /* ---------- time capsules ---------- */
@@ -1086,7 +1139,7 @@ function noteHTML(){
 }
 function cur(){ return ui.stack.length ? ui.stack[ui.stack.length - 1] : {type:ui.tab}; }
 function appHTML(){
-  var c = cur(), sub = ui.stack.length > 0, body, title, form = false;
+  var c = cur(), sub = ui.stack.length > 0, body, title, form = false, nu = unread();
   if (c.type === "home"){ body = homeHTML(); }
   else if (c.type === "search"){ body = searchHTML(); title = "검색"; }
   else if (c.type === "new"){ body = newHTML(); title = "새 게시물"; form = true; }
@@ -1095,10 +1148,12 @@ function appHTML(){
   else if (c.type === "user"){ body = profileHTML(c.id); title = who(c.id).name; }
   else if (c.type === "follows"){ body = followsHTML(); title = S.nick; }
   else if (c.type === "tune"){ body = tuneHTML(); title = "추천 조절"; }
+  else if (c.type === "notif"){ body = notifHTML(); title = "알림"; }
   else if (c.type === "note"){ body = noteHTML(); title = "노트"; form = true; }
   else { var p = getPost(c.id); body = p ? postCard(p, true) : '<div class="empty"><b>게시물을 찾을 수 없어요</b><span>삭제됐을 수 있습니다.</span></div>'; title = "게시물"; }
   var top = sub ? '<header class="top deep"><button class="iconbtn" data-act="back" aria-label="뒤로">' + I.back + '</button><div class="ttl">' + esc(title) + '</div><span class="iconbtn" aria-hidden="true"></span></header>'
-                : '<header class="top">' + (title ? '<div class="ttl">' + esc(title) + "</div>" : '<div class="brand">seoul<i>.</i></div><button class="iconbtn" data-act="tune" aria-label="추천 조절">' + I.tune + "</button>") + "</header>";
+                : '<header class="top">' + (title ? '<div class="ttl">' + esc(title) + "</div>" : '<div class="brand">seoul<i>.</i></div><span class="topacts"><button class="iconbtn nbell" data-act="notif" aria-label="알림' + (nu ? " " + nu + "개" : "") + '">' + I.bell + (nu ? '<span class="ndot">' + (nu > 9 ? "9+" : nu) + "</span>" : "") + "</button>" +
+                                                                         '<button class="iconbtn" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></span>") + "</header>";
   var tabs = [["home","홈",I.home],["search","검색",I.search],["new","새 게시물",I.plus],["likes","좋아요·저장",I.heart],["profile","내 프로필",I.user]];
   return top + (ui.preview ? '<p class="robar">미리보기 모드 · 글과 사진은 이 기기에만 저장되고 다른 사람에게 보이지 않아요.</p>' : "") +
     '<main class="scroll' + (form ? " form" : "") + '">' + body + "</main>" +
@@ -1114,6 +1169,7 @@ function render(keep, y){
   app.innerHTML = (v === "boot" ? splashHTML("연결하는 중…") :
                    v === "nodb" ? setupHTML() :
                    v === "login" ? loginHTML() : v === "signup" ? signupHTML() : appHTML()) +
+                  (v === "app" ? popHTML() : "") +
                   (ui.toast ? '<div class="toast" role="status">' + esc(ui.toast) + "</div>" : "");
   sc = scroller(); if (sc) sc.scrollTop = top;
   /* a redraw keeps each post on the photo it was showing */
@@ -1302,7 +1358,7 @@ function deleteAccount(){
   Object.keys(CM).forEach(function(pid){ CM[pid].forEach(function(c){ if (c.u === ME && c.id.indexOf("tmp") !== 0) jobs.push(db.doc("comments/" + c.id).delete()); }); });
   jobs.push(priv("state").delete()); jobs.push(db.doc("profiles/" + ME).delete());
   jobs.forEach(function(j){ j.catch(function(){}); });
-  S = null; SAVES = []; TUNE = {w:{}, mute:[]}; N = draft();
+  S = null; SAVES = []; TUNE = {w:{}, mute:[]}; SEEN = 0; N = draft();
   ui.view = "login"; ui.stack = []; ui.tab = "home"; ui.confirm = null;
   toast("계정을 삭제했어요."); render(false);
   setTimeout(function(){ if (auth) auth.signOut(); else location.reload(); }, 1200);
@@ -1346,7 +1402,8 @@ document.addEventListener("click", function(e){
   else if (a === "user"){ var c = cur();
     if (id === ME){ if (c.type !== "profile") tab("profile"); }
     else if (!(c.type === "user" && c.id === id)) push({type:"user", id:id}); }
-  else if (a === "post"){ push({type:"post", id:id}); }
+  else if (a === "post"){ if (ui.pop === id) ui.pop = null; push({type:"post", id:id}); }
+  else if (a === "notif"){ ui.nseen = SEEN; SEEN = Date.now(); ui.pop = null; savePrivate(); push({type:"notif"}); }
   else if (a === "car"){
     var cw = b.closest(".carwrap"), cc = cw && cw.querySelector(".car"); if (!cc) return;
     var ci = Math.max(0, Math.min(cc.children.length - 1, Math.round(cc.scrollLeft / cc.clientWidth) + (+b.dataset.d)));
@@ -1421,7 +1478,7 @@ document.addEventListener("click", function(e){
     var fref = db.doc("follows/" + ME + "~" + id), fi = -1;
     FOL.forEach(function(x, k){ if (x.u === ME && x.t === id) fi = k; });
     if (fi !== -1){ FOL.splice(fi, 1); fref.delete().catch(werr); }
-    else { FOL.push({u:ME, t:id}); fref.set({u:ME, t:id, at:Date.now()}).catch(werr); }
+    else { FOL.push({u:ME, t:id, at:Date.now()}); fref.set({u:ME, t:id, at:Date.now()}).catch(werr); }
     derive(); render(true);
   }
   else if (a === "cmore"){ ui.cshow[id] = (ui.cshow[id] || CPAGE) + CPAGE; render(true); }
@@ -1535,7 +1592,11 @@ function subscribe(){
     live();
   }, serr);
   db.collection("posts").orderBy("at", "desc").limit(300).onSnapshot(function(s){
-    RP = s.docs.map(function(d){ var x = clone(d.data()); x.id = d.id; return x; }); live();
+    RP = s.docs.map(function(d){ var x = clone(d.data()); x.id = d.id; return x; });
+    var prev = KNOWN; KNOWN = {};
+    RP.forEach(function(r){ KNOWN[r.id] = 1; });
+    if (prev){ derive(); var fresh = notifs().filter(function(p){ return !prev[p.id]; }); if (fresh.length) showPop(fresh[0].id); }
+    live();
   }, serr);
   db.collection("likes").limit(1000).onSnapshot(function(s){
     var lk = {}, at = {};
@@ -1543,7 +1604,7 @@ function subscribe(){
     LK = lk; LKAT = at; live();
   }, serr);
   db.collection("follows").limit(1000).onSnapshot(function(s){
-    FOL = s.docs.map(function(d){ var x = d.data(); return {u:x.u, t:x.t}; }).filter(function(x){ return x.u && x.t && !(/^a\d+$/.test(x.t) && !ABY[x.t]); }); live();
+    FOL = s.docs.map(function(d){ var x = d.data(); return {u:x.u, t:x.t, at:+x.at || 0}; }).filter(function(x){ return x.u && x.t && !(/^a\d+$/.test(x.t) && !ABY[x.t]); }); live();
   }, serr);
   db.collection("comments").limit(1000).onSnapshot(function(s){
     var cm = {};
@@ -1555,7 +1616,7 @@ function subscribe(){
     var caps = [];
     s.docs.forEach(function(d){
       var x = clone(d.data());
-      if (d.id === "state"){ if (idle("s")){ SAVES = x.saves || []; TUNE = x.tune || {w:{}, mute:[]}; if (!TUNE.w) TUNE.w = {}; if (!TUNE.mute) TUNE.mute = []; } }
+      if (d.id === "state"){ if (idle("s")){ SEEN = Math.max(SEEN, +x.seen || 0); SAVES = x.saves || []; TUNE = x.tune || {w:{}, mute:[]}; if (!TUNE.w) TUNE.w = {}; if (!TUNE.mute) TUNE.mute = []; } }
       else if (d.id.indexOf("cap_") === 0){ x.id = d.id.slice(4); if (!opening[x.id]) caps.push(x); }
     });
     CAPS = caps; if (ui.view === "app") openDue(); live();
