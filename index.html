@@ -1023,6 +1023,7 @@ function profileHTML(id){
   var fields = ex ? [a.f] : ((p && p.fields) || []).filter(function(f){ return FBY[f]; });
   var hl = fields.map(function(f){ return {f:FBY[f], lbl:FBY[f].name, word:FBY[f].word, act:'data-act="hl" data-f="' + f + '"'}; });
   if (ex) posts.forEach(function(q){ if (!hl.some(function(x){ return x.lbl === q.tag; })) hl.push({f:FBY[a.f], lbl:q.tag, word:"#", act:'data-act="hl" data-q="' + esc(q.tag) + '"'}); });
+  hl = [];   /* the round interest buttons are not shown on profiles any more */
   if (hl.length) h += '<div class="strip" aria-label="관심사">' + hl.map(function(x){
     return "<button " + x.act + ">" + ring('<div class="av" style="--s:56px;--h:' + x.f.h + ';font-size:' + (len(x.word) > 2 ? 17 : 22) + 'px" aria-hidden="true">' + esc(x.word) + "</div>", false) + '<span class="lbl">' + esc(x.lbl) + "</span></button>"; }).join("") + "</div>";
 
@@ -1846,22 +1847,29 @@ function localDb(key){
         if (!persist()){ if (prev === undefined) delete store[path]; else store[path] = prev; return Promise.reject({code:"quota_exceeded"}); }
         fire(); return Promise.resolve();
       },
+      update:function(data){
+        if (store[path] === undefined) return Promise.reject({code:"not-found"});
+        var next = JSON.parse(JSON.stringify(store[path])), k; for (k in data) next[k] = data[k];
+        return this.set(next);
+      },
       delete:function(){ delete store[path]; persist(); fire(); return Promise.resolve(); },
-      onSnapshot:function(n){ var f = function(){ n(snap(path)); }; subs.push(f); setTimeout(f, 0); return function(){}; } };
+      onSnapshot:function(n){ var f = function(){ n(snap(path)); }; subs.push(f); setTimeout(f, 0); return function(){ var i = subs.indexOf(f); if (i !== -1) subs.splice(i, 1); }; } };
   }
   function col(path, q){
     q = q || {};
     function run(){
       var pre = path + "/", docs = Object.keys(store).filter(function(k){ return k.indexOf(pre) === 0 && k.slice(pre.length).indexOf("/") === -1; }).sort().map(snap);
+      if (q.w) docs = docs.filter(function(d){ var v = d.data()[q.w.f]; return q.w.op === "array-contains" ? Array.isArray(v) && v.indexOf(q.w.v) !== -1 : v === q.w.v; });
       if (q.o) docs.sort(function(a, b){ var x = a.data()[q.o.f], y = b.data()[q.o.f]; return (x < y ? -1 : x > y ? 1 : 0) * (q.o.d === "desc" ? -1 : 1); });
       if (q.n) docs = docs.slice(0, q.n);
       return {docs:docs, size:docs.length, empty:!docs.length};
     }
     return { path:path,
-      orderBy:function(f, d){ return col(path, {o:{f:f, d:d || "asc"}, n:q.n}); },
-      limit:function(n){ return col(path, {o:q.o, n:n}); },
+      where:function(f, op, v){ return col(path, {w:{f:f, op:op, v:v}, o:q.o, n:q.n}); },
+      orderBy:function(f, d){ return col(path, {w:q.w, o:{f:f, d:d || "asc"}, n:q.n}); },
+      limit:function(n){ return col(path, {w:q.w, o:q.o, n:n}); },
       get:function(){ return Promise.resolve(run()); },
-      onSnapshot:function(n){ var f = function(){ n(run()); }; subs.push(f); setTimeout(f, 0); return function(){}; },
+      onSnapshot:function(n){ var f = function(){ n(run()); }; subs.push(f); setTimeout(f, 0); return function(){ var i = subs.indexOf(f); if (i !== -1) subs.splice(i, 1); }; },
       doc:function(id){ return doc(path + "/" + (id || ("d" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8)))); },
       add:function(data){ var r = this.doc(); return r.set(data).then(function(){ return r; }); } };
   }
