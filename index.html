@@ -1283,7 +1283,7 @@ function scanFresh(){
 
 /* ---------- communities: one per interest ---------- */
 function members(f){ return Object.keys(PROF).filter(function(id){ return !has(BLOCKS, id) && has(PROF[id].fields || [], f); }); }
-function commPosts(f){ return RP.map(realPost).filter(function(p){ return p.f === f && visible(p); }).sort(function(a, b){ return ptime(b) - ptime(a); }); }
+function commPosts(f){ return RP.map(realPost).filter(function(p){ return (p.f === f || (f === "etc" && !p.f)) && visible(p); }).sort(function(a, b){ return ptime(b) - ptime(a); }); }
 function commHTML(f){
   var F = FBY[f]; if (!F) return '<div class="empty"><b>없는 커뮤니티예요</b></div>';
   var mem = members(f), posts = commPosts(f), deb = posts.filter(function(p){ return p.debate; }), t = ui.ctab;
@@ -1607,6 +1607,11 @@ function homeHTML(){
   var nt = noteOf(S), tt = tuneTotals(), hidden = tt.total - tt.shown, realN = RP.length, fd = feed(), m = ui.feedMode;
   var h = '<section class="hero"><div class="herot"><h1>Find Your Community</h1><p>관심사가 같은 사람들과<br>더 넓은 세상을 만나보세요.</p><button class="btn primary" data-act="nav" data-t="comms">커뮤니티 둘러보기 →</button></div><span class="heroart cv-hero" aria-hidden="true"></span></section>';
   h += '<section class="group"><div class="rowhead pad"><h2 class="h2">추천 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기 ›</button></div><div class="crow2">' + featured().slice(0, 8).map(ccard).join("") + "</div></section>";
+  var rooms = allPosts().filter(function(p){ return p.debate; }).sort(function(a, b){ return ptime(b) - ptime(a); }).slice(0, 3);
+  if (rooms.length) h += '<section class="group"><div class="rowhead pad"><h2 class="h2">열린 토론방</h2><button class="link sm" data-act="etabgo" data-t="deb">전체 보기 ›</button></div><div class="nlist">' + rooms.map(function(p){
+      var v = votes(p.id), tot = v.pro + v.con, F = FBY[p.f] || FBY.etc;
+      return '<button class="trow2" data-act="post" data-id="' + p.id + '"><span class="nty">' + I.vote + '</span><span class="tt"><b>' + esc(snip(titleOf(p)[0] || p.t, 34)) + "</b><small>" + esc(F.name) + " · " +
+        (tot ? "찬성 " + Math.round(v.pro / tot * 100) + "% · " + tot + "명 참여" : "첫 투표를 기다리는 중") + " · 의견 " + ncm(p.id) + "개</small></span>" + I.chev + "</button>"; }).join("") + "</div></section>";
   h += '<section class="group"><div class="rowhead pad"><h2 class="h2">인기 게시물</h2><button class="iconbtn sm" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></div>" +
        '<div class="pad">' + tabsHTML("fmode", m, [["rec","추천순"],["new","최신순"],["hot","인기순"],["fol","팔로잉"]]) + "</div>" +
        '<div class="chips rowx" role="group" aria-label="관심사로 보기"><button class="chip" data-act="ff" data-id="all" aria-pressed="' + (ui.ff === "all") + '">전체</button>' +
@@ -2341,6 +2346,8 @@ function publish(){
   if (wasDeb && !topic){ toast("토론 주제를 적어 주세요."); render(true); var te = document.getElementById("ntopic"); if (te) te.focus(); return; }
   if (!wasDeb && !N.items.length && !body){ toast("글을 쓰거나 사진·동영상을 골라 주세요."); render(true); return; }
   var text = wasDeb ? topic + (body ? "\n" + body : "") : body;
+  if (wasDeb && !FBY[N.f]) N.f = S.fields[0] || "etc";
+  var roomF = N.f;
   var lastMine = RP.filter(function(r){ return r.uid === ME; }).reduce(function(m, r){ return Math.max(m, +r.at || 0); }, 0);
   if (Date.now() - lastMine < 20000){ toast("방금 글을 올렸어요. 잠시 뒤에 다시 올려 주세요."); render(true); return; }
   var openAt = 0;
@@ -2358,7 +2365,11 @@ function publish(){
   }).then(function(){
     ui.busy = false; N = draft(); ui.ai = []; ui.aiMsg = ""; ui.sFor = null;
     if (openAt){ toast("타임캡슐을 묻었어요. " + longDate(openAt) + "에 열립니다."); ui.ltab = "cap"; tab("profile", "saved"); }
-    else { toast(ui.preview ? "게시물을 올렸어요. 미리보기라 이 기기에만 저장됩니다." : "게시물을 올렸어요. 다른 기기에서도 바로 보입니다."); if (wasDeb) toast("토론방을 만들었어요. 홈과 커뮤니티의 토론방 탭에서 볼 수 있어요."); tab("home"); }
+    else { toast(ui.preview ? "게시물을 올렸어요. 미리보기라 이 기기에만 저장됩니다." : "게시물을 올렸어요. 다른 기기에서도 바로 보입니다."); if (wasDeb && FBY[roomF]){
+        /* straight to where the new room is listed */
+        toast(FBY[roomF].name + " 커뮤니티의 토론 탭에 토론방을 만들었어요.");
+        closeChat(); ui.tab = "home"; ui.stack = []; ui.rootY = 0; push({type:"comm", id:roomF}); ui.ctab = "debate"; render(false);
+      } else tab("home"); }
   }, function(e){ ui.busy = false; toast(uploadMsg(e)); render(true); });
 }
 function deletePost(id){
@@ -2425,6 +2436,7 @@ document.addEventListener("click", function(e){
   else if (a === "tab"){ tab(b.dataset.t); }
   else if (a === "nav"){ navTo(b.dataset.t); }
   else if (a === "etab"){ ui.etab = b.dataset.t; render(false); }
+  else if (a === "etabgo"){ ui.etab = b.dataset.t; ui.q = ""; tab("search"); }
   else if (a === "stab"){ ui.stab = b.dataset.t; render(false); }
   else if (a === "ntab"){ ui.ntab = b.dataset.t; render(false); }
   else if (a === "ccat"){ ui.ccat = b.dataset.v || b.dataset.t; render(true); }
@@ -2465,13 +2477,14 @@ document.addEventListener("click", function(e){
   else if (a === "cjoin"){ if (!need()) return; toggle(S.fields, id); prune(S); saveProfile(); toast(has(S.fields, id) ? FBY[id].name + " 커뮤니티에 가입했어요." : FBY[id].name + " 커뮤니티에서 나왔어요."); render(true); }
   else if (a === "cwrite"){ ui.sheet = null; if (!need()) return; N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } tab("new"); }
   else if (a === "tag"){ ui.q = b.dataset.q || ""; ui.stab = "all"; if (ui.tab !== "search" || ui.stack.length) tab("search"); else render(false); }
-  else if (a === "ndeb"){ N.debate = !N.debate; render(true); }
-  else if (a === "nmode"){ N.debate = b.dataset.t === "deb"; render(true); if (N.debate){ el = document.getElementById("ntopic"); if (el) el.focus(); } }
+  else if (a === "ndeb"){ N.debate = !N.debate; if (N.debate && !N.f) N.f = S.fields[0] || "etc"; render(true); }
+  else if (a === "nmode"){ N.debate = b.dataset.t === "deb"; if (N.debate && !N.f) N.f = S.fields[0] || "etc"; render(true); if (N.debate){ el = document.getElementById("ntopic"); if (el) el.focus(); } }
   else if (a === "cdebate"){
     ui.sheet = null;
     if (!need()) return;
     N.debate = true;
     if (id && FBY[id]){ N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } }
+    if (!N.f) N.f = S.fields[0] || "etc";
     tab("new"); el = document.getElementById("ntopic"); if (el) el.focus();
   }
   else if (a === "vote"){
@@ -2628,7 +2641,7 @@ document.addEventListener("click", function(e){
   else if (a === "delpost-yes"){ deletePost(id); toast("게시물을 삭제했어요."); back(); }
   /* new post */
   else if (a === "rmitem"){ N.items.splice(+b.dataset.i, 1); ui.ai = []; ui.aiMsg = ""; render(true); }
-  else if (a === "nf"){ N.f = N.f === id ? "" : id; render(true); }
+  else if (a === "nf"){ N.f = N.f === id && !N.debate ? "" : id; render(true); }   /* a debate room keeps its community: pressing it again does not take it off */
   else if (a === "publish"){ publish(); }
   /* account */
   else if (a === "reset"){ ui.confirm = "reset"; render(true); el = scroller(); if (el) el.scrollTop = el.scrollHeight; }
