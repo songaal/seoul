@@ -392,6 +392,46 @@ svg.i{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 .rtxt small{color:var(--ink-2);font-size:12px;margin-top:2px}
 .racts{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:8px}
 @media (prefers-reduced-motion:no-preference){.sheet{animation:up .2s ease-out}}
+/* hearts that float up when a like is pressed */
+.fly{position:fixed;z-index:30;width:24px;height:24px;margin:-12px 0 0 -12px;pointer-events:none;color:var(--accent);opacity:0;animation:fly 1.1s cubic-bezier(.2,.7,.3,1) forwards}
+.fly svg.i{width:100%;height:100%;fill:currentColor;stroke:none;display:block}
+@keyframes fly{0%{opacity:0;transform:translate(0,0) scale(.3)}18%{opacity:1}70%{opacity:.9}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(var(--sc))}}
+/* short-form: one video per screen, filling it */
+.nav{grid-template-columns:repeat(6,1fr)}
+.scroll.shorts{gap:0;padding:0;background:#000;color:#fff;scroll-snap-type:y mandatory;scroll-behavior:auto;overscroll-behavior:contain;scrollbar-width:none}
+.scroll.shorts::-webkit-scrollbar{display:none}
+.scroll.shorts + .nav{background:#000;border-top-color:#000}
+.scroll.shorts + .nav button{color:#fff}
+.shempty{margin:auto;color:#fff}
+.shempty span{color:rgba(255,255,255,.75)}
+.sh{flex:0 0 100%;height:100%;position:relative;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always;background:#000}
+.shv{position:absolute;inset:0;cursor:pointer;outline-offset:-3px}
+.shv video{width:100%;height:100%;object-fit:cover;display:block;background:#000}
+.shstate{position:absolute;left:50%;top:50%;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:none;place-items:center;pointer-events:none}
+.shstate svg.i{width:36px;height:36px;fill:currentColor;stroke:none}
+.sh.paused .shstate{display:grid}
+.shload{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:86%;padding:9px 16px;border-radius:999px;background:rgba(0,0,0,.65);color:#fff;font-size:13px;font-weight:600;text-align:center;pointer-events:none}
+.shload:not([hidden]) ~ .shstate,.shload:not([hidden]) + .shstate{display:none}
+.shui{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-end;gap:6px;padding:16px 6px 20px 16px;color:#fff;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,0) 36%),linear-gradient(to bottom,rgba(0,0,0,.4),rgba(0,0,0,0) 16%)}
+.shui button{pointer-events:auto;color:#fff}
+.shtag{position:absolute;left:16px;top:14px;font-family:var(--display);font-size:22px;line-height:1;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.shinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;text-shadow:0 1px 3px rgba(0,0,0,.65)}
+.shwho{display:flex;align-items:center;gap:10px;min-width:0}
+.shname{display:flex;align-items:center;gap:8px;min-width:0;min-height:44px;font-size:15px}
+.shname b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shname .av{box-shadow:0 0 0 2px #fff}
+.sh .fbtn{min-height:32px;min-width:0;padding:0 12px;background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px #fff}
+.sh .fbtn[aria-pressed="true"]{background:rgba(255,255,255,.2);color:#fff;box-shadow:none}
+.shcap{font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;white-space:pre-line}
+.shside{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.shb{width:52px;min-height:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.shb svg.i{width:30px;height:30px}
+.shb small{font-size:12px;font-weight:700;line-height:1.1;min-height:13px}
+.shb.heart[aria-pressed="true"]{color:var(--accent)}
+.shb.heart[aria-pressed="true"] svg.i,.shb.save[aria-pressed="true"] svg.i{fill:currentColor}
+.shbar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.25);pointer-events:none}
+.shbar i{display:block;height:100%;width:0;background:#fff}
+@media (prefers-reduced-motion:no-preference){.shb.heart[aria-pressed="true"] svg.i{animation:pop .28s ease-out} @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.25)}100%{transform:scale(1)}}}
 .robar{margin:0;padding:8px 16px;font-size:12px;background:var(--accent-soft);color:var(--ink);text-align:center}
 </style>
 
@@ -575,6 +615,9 @@ var I = {
   lock:   ico('<rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/>'),
   stop:   ico('<rect x="7" y="7" width="10" height="10" rx="1.5"/>'),
   play:   ico('<path d="M8 5.5v13l11-6.5z"/>'),
+  shorts: ico('<rect x="6" y="2.5" width="12" height="19" rx="3.5"/><path d="M10.2 8.8v6.4l5.2-3.2z"/>'),
+  vol:    ico('<path d="M4 9.5v5h3.5l4.5 4v-13l-4.500 4z"/><path d="M15.5 9a4.200 4.200 0 0 1 0 6M18 6.500a7.800 7.800 0 0 1 0 11"/>'),
+  mute:   ico('<path d="M4 9.5v5h3.5l4.5 4v-13l-4.500 4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>'),
   more:   ico('<circle cx="5.5" cy="12" r="1.1"/><circle cx="12" cy="12" r="1.1"/><circle cx="18.5" cy="12" r="1.1"/>'),
   list:   ico('<rect x="6" y="5" width="12" height="14" rx="1"/><path d="M6 2.5h12M6 21.5h12"/>')
 };
@@ -724,6 +767,156 @@ function media(p){
   }
   var f = FBY[p.f] || FBY.etc;
   return '<div class="media"><div class="tile" style="--h:' + (f.h + (p.v ? 16 : 0)) + '"><span class="tag">' + esc(p.tag) + '</span><span class="word" aria-hidden="true">' + esc(f.word) + "</span></div></div>";
+}
+/* hearts that float up from wherever a like was pressed */
+function burstAt(x, y){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var i, s;
+  for (i = 0; i < 7; i++){
+    s = document.createElement("span"); s.className = "fly"; s.setAttribute("aria-hidden", "true"); s.innerHTML = I.heart;
+    s.style.left = x + "px"; s.style.top = y + "px";
+    s.style.setProperty("--dx", Math.round((Math.random() - 0.5) * 90) + "px");
+    s.style.setProperty("--dy", -(90 + Math.round(Math.random() * 110)) + "px");
+    s.style.setProperty("--sc", (0.8 + Math.random() * 1).toFixed(2));
+    s.style.animationDelay = (i * 70) + "ms";
+    s.addEventListener("animationend", function(e){ e.currentTarget.remove(); });
+    document.body.appendChild(s);
+  }
+  setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll(".fly"), function(el){ if (!el.getAnimations || !el.getAnimations().length) el.remove(); }); }, 2500);
+}
+function burst(sel){
+  var el = null, H = window.innerHeight;
+  Array.prototype.forEach.call(app.querySelectorAll(sel), function(x){
+    var r = x.getBoundingClientRect(); if (!el && x.offsetParent && r.bottom > 0 && r.top < H) el = x; });
+  if (!el) return;
+  var r = (el.querySelector("svg") || el).getBoundingClientRect();
+  burstAt(r.left + r.width / 2, r.top + r.height / 2);
+}
+/* returns true when the post has just become liked */
+function setLike(id, onlyOn){
+  var arr = LK[id] || (LK[id] = []), ref = db.doc("likes/" + id + "~" + ME), was = has(arr, ME);
+  if (was && onlyOn) return false;
+  if (was){ toggleOff(arr, ME); delete LKAT[id]; ref.delete().catch(werr); }
+  else { arr.push(ME); LKAT[id] = Date.now(); ref.set({p:id, u:ME, at:Date.now()}).catch(werr); }
+  derive(); return !was;
+}
+
+/* ---------- short-form: every video people posted, one per screen ---------- */
+var VP = {};            // videos being fetched right now, so two screens never fetch the same one twice
+var shIO = null, shCur = null, shTapT = null;
+function vfetch(cv, n, type){
+  if (VURL[cv]) return Promise.resolve(VURL[cv]);
+  if (VP[cv]) return VP[cv];
+  var say = function(){
+    var t = "불러오는 중 " + (VLOAD[cv] || 0) + "%", lab = document.getElementById("vl-" + cv); if (lab) lab.textContent = t;
+    Array.prototype.forEach.call(app.querySelectorAll(".shload"), function(x){ if (x.dataset.cv === cv){ x.hidden = false; x.textContent = t; } });
+  };
+  VLOAD[cv] = 0; say();
+  return VP[cv] = vstore.get(cv, n, type, function(d, t){ VLOAD[cv] = Math.round(d / t * 100); say(); }).then(function(blob){
+    VURL[cv] = URL.createObjectURL(blob); delete VLOAD[cv]; delete VP[cv]; return VURL[cv];
+  }, function(e){ delete VLOAD[cv]; delete VP[cv]; throw e; });
+}
+function shortsList(){
+  var out = [];
+  RP.map(realPost).filter(visible).sort(function(a, b){ return (b.openedAt || b.at) - (a.openedAt || a.at); }).forEach(function(p){
+    (p.media || []).forEach(function(m, i){ if (m.k === "vid") out.push({p:p, m:m, key:p.id + "~" + i}); });
+  });
+  return out;
+}
+function shUI(x){
+  var p = x.p, a = who(p.a), liked = has(MYL, p.id), saved = has(SAVES, p.id), n = (LK[p.id] || []).length,
+      cs = (CM[p.id] || []).filter(function(c){ return !has(BLOCKS, c.u); }).length, mute = !!ui.shMute;
+  return '<span class="shtag">숏폼</span>' +
+    '<div class="shinfo"><div class="shwho"><button class="shname" data-act="user" data-id="' + esc(a.id) + '">' + av(a.id, 36) + "<b>" + esc(a.name) + "</b></button>" + (a.me || a.gone ? "" : followBtn(a.id)) + "</div>" +
+      (p.t ? '<p class="shcap">' + esc(p.t) + "</p>" : "") + "</div>" +
+    '<div class="shside">' +
+      '<button class="shb heart" data-act="like" data-id="' + p.id + '" aria-pressed="' + liked + '" aria-label="' + (liked ? "좋아요 취소" : "좋아요") + '">' + I.heart + "<small>" + (n || "") + "</small></button>" +
+      '<button class="shb" data-act="post" data-id="' + p.id + '" aria-label="댓글 ' + cs + '개 보기">' + I.cmt + "<small>" + (cs || "") + "</small></button>" +
+      '<button class="shb save" data-act="save" data-id="' + p.id + '" aria-pressed="' + saved + '" aria-label="' + (saved ? "저장 취소" : "저장") + '">' + I.bm + "</button>" +
+      '<button class="shb" data-act="shmute" aria-pressed="' + mute + '" aria-label="' + (mute ? "소리 켜기" : "소리 끄기") + '">' + (mute ? I.mute : I.vol) + "</button>" +
+      '<button class="shb" data-act="more" data-id="' + p.id + '" aria-label="더보기">' + I.more + "</button>" +
+    "</div>";
+}
+function shortsHTML(){
+  var L = shortsList();
+  if (!L.length) return '<div class="empty shempty"><b>아직 올라온 동영상이 없어요</b><span>새 게시물에서 동영상을 올리면 여기에서 화면 가득 볼 수 있어요.</span>' +
+    (ui.ro ? "" : '<button class="btn small" data-act="tab" data-t="new">동영상 올리기</button>') + "</div>";
+  return L.map(function(x){
+    var m = x.m, ready = !m.cv || VURL[m.cv], poster = m.poster || m.psrc ? psrc(m) : "";
+    return '<section class="sh" data-key="' + esc(x.key) + '" data-id="' + esc(x.p.id) + '">' +
+      '<div class="shv" data-act="shtap" role="button" tabindex="0" aria-label="동영상 재생·멈춤">' +
+        "<video" + (ready ? ' src="' + esc(m.cv ? VURL[m.cv] : src(m)) + '"' : "") +
+          (m.cv ? ' data-cv="' + esc(m.cv) + '" data-n="' + (+m.n || 0) + '" data-type="' + esc(m.type || "video/mp4") + '"' : "") +
+          (poster ? ' poster="' + esc(poster) + '"' : "") + ' loop playsinline preload="' + (poster ? "none" : "metadata") + '"></video>' +
+        '<span class="shload"' + (m.cv ? ' data-cv="' + esc(m.cv) + '"' : "") + " hidden></span>" +
+        '<span class="shstate" aria-hidden="true">' + I.play + "</span></div>" +
+      '<div class="shui">' + shUI(x) + "</div>" +
+      '<div class="shbar" aria-hidden="true"><i></i></div></section>';
+  }).join("");
+}
+function inShorts(){ return ui.view === "app" && cur().type === "shorts" && !!app.querySelector(".scroll.shorts .sh"); }
+/* refreshes the buttons and counts on top of the videos without touching the videos; false when the list itself changed */
+function shortsSync(){
+  if (!inShorts()) return false;
+  var L = shortsList(), secs = app.querySelectorAll(".scroll.shorts .sh"), i;
+  if (L.length !== secs.length) return false;
+  for (i = 0; i < L.length; i++) if (secs[i].dataset.key !== L[i].key) return false;
+  for (i = 0; i < L.length; i++) secs[i].querySelector(".shui").innerHTML = shUI(L[i]);
+  return true;
+}
+function redraw(){ if (!shortsSync()) render(true); }
+function shPlay(s){
+  var v = s.querySelector("video"), cv = v.dataset.cv, lab = s.querySelector(".shload"), keep = ui.shT && ui.shT.key === s.dataset.key ? ui.shT : null;
+  if (cv && !VURL[cv]){
+    if (!vstore){ lab.hidden = false; lab.textContent = "이 동영상은 여기에서 볼 수 없어요."; return; }
+    vfetch(cv, +v.dataset.n || 0, v.dataset.type).then(function(){ lab.hidden = true; if (shCur === s) shPlay(s); },
+      function(){ lab.hidden = false; lab.textContent = "불러오지 못했어요. 화면을 눌러 다시 시도하세요."; s.classList.add("paused"); });
+    return;
+  }
+  ui.shT = null; lab.hidden = true;
+  if (!v.getAttribute("src")) v.src = VURL[cv];
+  if (keep && keep.t > 0.3){
+    var seek = function(){ try{ v.currentTime = keep.t; }catch(e){} };
+    if (v.readyState >= 1) seek(); else v.addEventListener("loadedmetadata", seek, {once:true});
+  }
+  if (keep && keep.paused){ s.classList.add("paused"); if (v.preload === "none") v.preload = "metadata"; return; }
+  s.classList.remove("paused");
+  v.muted = !!ui.shMute;
+  var pr = v.play();
+  if (pr && pr.catch) pr.catch(function(){
+    if (shCur !== s || !v.paused) return;
+    if (!v.muted){   /* the browser refused to start with sound: start silent and let the sound button turn it on */
+      ui.shMute = true; v.muted = true; shortsSync();
+      var p2 = v.play(); if (p2 && p2.catch) p2.catch(function(){ if (shCur === s && v.paused) s.classList.add("paused"); });
+    } else s.classList.add("paused");
+  });
+}
+function shActivate(s){
+  if (shCur === s) return;
+  if (shCur){ var ov = shCur.querySelector("video"); if (ov && !ov.paused) ov.pause(); shCur.classList.remove("on", "paused"); }
+  shCur = s; s.classList.add("on"); ui.shKey = s.dataset.key;
+  shPlay(s);
+}
+function shortsInit(){
+  if (shIO){ shIO.disconnect(); shIO = null; }
+  shCur = null;
+  var sc = app.querySelector(".scroll.shorts"), secs = sc ? sc.querySelectorAll(".sh") : [], i, at = null;
+  if (!secs.length) return;
+  if (ui.shFresh){ ui.shFresh = false; ui.shKey = null; ui.shT = null; }
+  for (i = 0; i < secs.length; i++) if (ui.shKey && secs[i].dataset.key === ui.shKey) at = secs[i];
+  sc.scrollTop = at ? at.offsetTop : 0;
+  Array.prototype.forEach.call(secs, function(s){
+    var v = s.querySelector("video"), bar = s.querySelector(".shbar i");
+    v.addEventListener("timeupdate", function(){ if (v.duration) bar.style.width = (v.currentTime / v.duration * 100).toFixed(1) + "%"; });
+    v.addEventListener("playing", function(){ s.classList.remove("paused"); });
+    v.addEventListener("pause", function(){ if (s === shCur) s.classList.add("paused"); });
+  });
+  if (window.IntersectionObserver){
+    shIO = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting && e.intersectionRatio >= 0.6) shActivate(e.target); });
+    }, {root:sc, threshold:[0.6]});
+    Array.prototype.forEach.call(secs, function(s){ shIO.observe(s); });
+  } else shActivate(at || secs[0]);
 }
 function followBtn(id, wide){
   var on = has(MYF, id);
@@ -1279,9 +1472,10 @@ function noteHTML(){
 }
 function cur(){ return ui.stack.length ? ui.stack[ui.stack.length - 1] : {type:ui.tab}; }
 function appHTML(){
-  var c = cur(), sub = ui.stack.length > 0, body, title, form = false, nu = unread();
+  var c = cur(), sub = ui.stack.length > 0, body, title, form = false, full = false, nu = unread();
   if (c.type === "home"){ body = homeHTML(); }
   else if (c.type === "search"){ body = searchHTML(); title = "검색"; }
+  else if (c.type === "shorts"){ body = shortsHTML(); title = "숏폼"; full = body.indexOf('class="sh"') !== -1; }
   else if (c.type === "new"){ body = newHTML(); title = "새 게시물"; form = true; }
   else if (c.type === "likes"){ body = likesHTML(); title = "좋아요·저장"; }
   else if (c.type === "profile"){ body = profileHTML(ME); title = S.nick; }
@@ -1297,9 +1491,10 @@ function appHTML(){
                    (c.type === "user" && !ABY[c.id] && !ui.ro ? '<button class="iconbtn" data-act="umore" data-id="' + esc(c.id) + '" aria-label="더보기">' + I.more + "</button>" : '<span class="iconbtn" aria-hidden="true"></span>') + "</header>"
                 : '<header class="top">' + (title ? '<div class="ttl">' + esc(title) + "</div>" : '<div class="brand">seoul<i>.</i></div><span class="topacts"><button class="iconbtn nbell" data-act="notif" aria-label="알림' + (nu ? " " + nu + "개" : "") + '">' + I.bell + (nu ? '<span class="ndot">' + (nu > 9 ? "9+" : nu) + "</span>" : "") + "</button>" +
                                                                          '<button class="iconbtn" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></span>") + "</header>";
-  var tabs = [["home","홈",I.home],["search","검색",I.search],["new","새 게시물",I.plus],["likes","좋아요·저장",I.heart],["profile","내 프로필",I.user]];
+  var tabs = [["home","홈",I.home],["search","검색",I.search],["shorts","숏폼",I.shorts],["new","새 게시물",I.plus],["likes","좋아요·저장",I.heart],["profile","내 프로필",I.user]];
+  if (full) top = '<h1 class="sr-only">숏폼</h1>';
   return top + (ui.preview ? '<p class="robar">미리보기 모드 · 글과 사진은 이 기기에만 저장되고 다른 사람에게 보이지 않아요.</p>' : "") +
-    '<main class="scroll' + (form ? " form" : "") + '">' + body + "</main>" +
+    '<main class="scroll' + (form ? " form" : "") + (c.type === "shorts" ? " shorts" : "") + '">' + body + "</main>" +
     '<nav class="nav" aria-label="주 메뉴">' + tabs.map(function(t){
       return '<button data-act="tab" data-t="' + t[0] + '" aria-label="' + t[1] + '"' + (!sub && ui.tab === t[0] ? ' aria-current="page"' : "") + ">" + t[2] + "</button>"; }).join("") + "</nav>";
 }
@@ -1309,6 +1504,7 @@ function scroller(){ return app.querySelector(".scroll"); }
 function render(keep, y){
   var sc = scroller(), top = typeof y === "number" ? y : (keep && sc ? sc.scrollTop : 0), v = ui.view;
   ui.stale = false;
+  if (shCur && app.contains(shCur)){ var sv = shCur.querySelector("video"); ui.shT = {key:shCur.dataset.key, t:sv ? sv.currentTime : 0, paused:shCur.classList.contains("paused")}; }
   app.innerHTML = (v === "boot" ? splashHTML("연결하는 중…") :
                    v === "nodb" ? setupHTML() :
                    v === "login" ? loginHTML() : v === "signup" ? signupHTML() : appHTML()) +
@@ -1320,6 +1516,7 @@ function render(keep, y){
     var i = ui.car[w.dataset.car], c = w.querySelector(".car"); if (!i || !c) return;
     c.style.scrollBehavior = "auto"; c.scrollLeft = i * c.clientWidth; c.style.scrollBehavior = "";
   });
+  shortsInit();
 }
 function syncCar(c, i){
   var w = c.parentNode, m = w.parentNode, n = c.children.length, dots = m.querySelectorAll(".dots i"), k, el;
@@ -1334,7 +1531,7 @@ function soft(){
   if (ui.view !== "app") return;
   var ae = document.activeElement, typing = ae && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && app.contains(ae);
   var playing = Array.prototype.some.call(app.querySelectorAll("video"), function(v){ return !v.paused && !v.ended; });
-  if (typing || playing || ui.busy){ ui.stale = true; return; }
+  if (typing || playing || ui.busy){ ui.stale = true; if (!ui.sheet) shortsSync(); return; }
   render(true);
 }
 function derive(){
@@ -1356,7 +1553,7 @@ function back(){
   ui.stack.pop(); ui.openC = null; ui.confirm = null;
   render(false, ui.stack.length ? ui.stack[ui.stack.length - 1].y || 0 : ui.rootY);
 }
-function tab(t, pt){ stopSong(); ui.tab = t; ui.stack = []; ui.rootY = 0; ui.openC = null; ui.confirm = null; ui.ptab = pt || "grid"; ui.gedit = false; ui.gsel = null; openDue(); render(false); }
+function tab(t, pt){ stopSong(); ui.shFresh = true; ui.tab = t; ui.stack = []; ui.rootY = 0; ui.openC = null; ui.confirm = null; ui.ptab = pt || "grid"; ui.gedit = false; ui.gsel = null; openDue(); render(false); }
 
 function finish(){
   D.nick = D.nick.trim(); D.bio = D.bio.trim(); prune(D);
@@ -1612,13 +1809,29 @@ document.addEventListener("click", function(e){
   }
   else if (a === "vload"){
     var cv = b.dataset.cv; if (!vstore || !cv || VLOAD[cv] != null) return;
-    VLOAD[cv] = 0; b.disabled = true; el = document.getElementById("vl-" + cv); if (el) el.textContent = "불러오는 중 0%";
-    vstore.get(cv, +b.dataset.n || 0, b.dataset.type, function(d, n){
-      VLOAD[cv] = Math.round(d / n * 100); var lab = document.getElementById("vl-" + cv); if (lab) lab.textContent = "불러오는 중 " + VLOAD[cv] + "%";
-    }).then(function(blob){
-      VURL[cv] = URL.createObjectURL(blob); delete VLOAD[cv]; render(true);
+    b.disabled = true;
+    vfetch(cv, +b.dataset.n || 0, b.dataset.type).then(function(){
+      render(true);
       var v = app.querySelector('video[data-cv="' + cv + '"]'); if (v){ var pr = v.play(); if (pr && pr.catch) pr.catch(function(){}); }
-    }, function(){ delete VLOAD[cv]; toast("동영상을 불러오지 못했어요. 다시 눌러 주세요."); render(true); });
+    }, function(){ toast("동영상을 불러오지 못했어요. 다시 눌러 주세요."); render(true); });
+  }
+  /* short-form: one tap stops or starts the video, two quick taps like it */
+  else if (a === "shtap"){
+    var sec = b.closest(".sh"), sv = sec && sec.querySelector("video"); if (!sv) return;
+    if (shTapT){
+      clearTimeout(shTapT); shTapT = null;
+      if (!need()) return;
+      setLike(sec.dataset.id, true); shortsSync(); burstAt(e.clientX, e.clientY);
+    } else shTapT = setTimeout(function(){
+      shTapT = null; if (!app.contains(sec)) return;
+      if (shCur !== sec){ shActivate(sec); return; }
+      if (sv.paused){ ui.shT = null; shPlay(sec); } else sv.pause();
+    }, 230);
+  }
+  else if (a === "shmute"){
+    ui.shMute = !ui.shMute;
+    Array.prototype.forEach.call(app.querySelectorAll(".sh video"), function(x){ x.muted = !!ui.shMute; });
+    shortsSync();
   }
   else if (a === "songpick"){
     var sg = ui.sres[+b.dataset.i]; if (!sg) return;
@@ -1662,19 +1875,18 @@ document.addEventListener("click", function(e){
   /* post actions */
   else if (a === "like"){
     if (!need()) return;
-    var arr = LK[id] || (LK[id] = []), ref = db.doc("likes/" + id + "~" + ME);
-    if (has(arr, ME)){ toggleOff(arr, ME); delete LKAT[id]; ref.delete().catch(werr); }
-    else { arr.push(ME); LKAT[id] = Date.now(); ref.set({p:id, u:ME, at:Date.now()}).catch(werr); }
-    derive(); render(true);
+    var nowLiked = setLike(id);
+    redraw();
+    if (nowLiked) burst('[data-act="like"][data-id="' + id + '"]');
   }
-  else if (a === "save"){ if (!need()) return; toggle(SAVES, id); savePrivate(); render(true); }
+  else if (a === "save"){ if (!need()) return; toggle(SAVES, id); savePrivate(); redraw(); }
   else if (a === "fuser"){
     if (!need()) return;
     var fref = db.doc("follows/" + ME + "~" + id), fi = -1;
     FOL.forEach(function(x, k){ if (x.u === ME && x.t === id) fi = k; });
     if (fi !== -1){ FOL.splice(fi, 1); fref.delete().catch(werr); }
     else { FOL.push({u:ME, t:id, at:Date.now()}); fref.set({u:ME, t:id, at:Date.now()}).catch(werr); }
-    derive(); render(true);
+    derive(); redraw();
   }
   else if (a === "cshow"){ ui.cshow[id] = (ui.cshow[id] || CPAGE) + CPAGE; render(true); }
   else if (a === "cmt"){
@@ -1765,6 +1977,12 @@ document.addEventListener("change", function(e){
 });
 
 /* redraw what was held back while typing or watching */
+document.addEventListener("keydown", function(e){
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("shv")){
+    e.preventDefault(); var s = e.target.closest(".sh"), v = s.querySelector("video");
+    if (shCur !== s) shActivate(s); else if (v.paused){ ui.shT = null; shPlay(s); } else v.pause();
+  }
+});
 document.addEventListener("focusout", function(){ if (ui.stale) setTimeout(function(){ if (ui.stale) soft(); }, 150); });
 document.addEventListener("pause", function(){ if (ui.stale) setTimeout(function(){ if (ui.stale) soft(); }, 150); }, true);
 
