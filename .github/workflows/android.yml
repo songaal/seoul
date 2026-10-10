@@ -72,6 +72,6 @@ jobs:
           cp android/app/build/outputs/apk/release/app-release.apk seoul.apk
           ls -la seoul.apk
           gh release create "v$VERSION_NAME" seoul.apk \
-            --title "Orbit Android $VERSION_NAME" \
-            --notes "Orbit 안드로이드 앱 설치 파일입니다. seoul.apk 를 받아서 설치하세요. (파일 이름은 예전 링크가 계속 열리도록 그대로 두었습니다.)" \
+            --title "seoul Android $VERSION_NAME" \
+            --notes "안드로이드 앱 설치 파일입니다. seoul.apk 를 받아서 설치하세요." \
             --latest

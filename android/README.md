@@ -1,6 +1,6 @@
-# Orbit 안드로이드 앱
+# seoul 안드로이드 앱
 
-Orbit 웹사이트(`https://songaal.github.io/seoul/`)를 휴대폰의 Chrome으로 전체 화면에 띄우는 얇은 껍데기 앱입니다.
+seoul 웹사이트(`https://songaal.github.io/seoul/`)를 휴대폰의 Chrome으로 전체 화면에 띄우는 얇은 껍데기 앱입니다.
 화면과 기능은 전부 웹사이트라서, 사이트를 고치면 앱도 같이 바뀝니다. 앱을 다시 설치할 필요가 없습니다.
 
 ## 설치 파일 받기

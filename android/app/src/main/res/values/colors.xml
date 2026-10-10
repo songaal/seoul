@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1C1D3C</color>
-    <color name="navigationColor">#1C1D3C</color>
-    <color name="ic_launcher_background">#6D5AE6</color>
+    <color name="colorPrimary">#17152E</color>
+    <color name="navigationColor">#17152E</color>
+    <color name="ic_launcher_background">#17152E</color>
 </resources>

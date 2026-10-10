@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
 }
 
-// The app is a thin shell: it opens the Orbit website full screen in the phone's own Chrome.
+// The app is a thin shell: it opens the seoul website full screen in the phone's own Chrome.
 // Everything the user sees is the site, so updating the site updates the app.
 def site = [
     hostName : 'songaal.github.io',
