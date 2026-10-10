@@ -700,6 +700,13 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
 .splash > .splashart{position:absolute;left:0;right:0;top:0;height:50%;max-width:none;background-size:cover;background-position:66% 45%;mix-blend-mode:screen;pointer-events:none;
   -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent);mask-image:linear-gradient(to bottom,#000 62%,transparent)}
 .brand.big .omark{width:84px;height:84px;filter:drop-shadow(0 12px 28px rgba(30,16,120,.55))}
+/* making a community */
+.ccprev{border-radius:18px;overflow:hidden;border:1px solid var(--line);max-width:300px}
+.ccprev .cover{aspect-ratio:16/9}
+.emos{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+.emo{aspect-ratio:1;border-radius:12px;background:var(--surface-2);font-size:20px;line-height:1;display:grid;place-items:center}
+.emo:hover{background:var(--surface-3)}
+.emo[aria-pressed="true"]{background:var(--accent-soft);box-shadow:inset 0 0 0 2px #fff}
 /* writing a post */
 .composer{border:1.5px solid rgba(255,255,255,.2);border-radius:18px;background:var(--surface-2);overflow:hidden}
 .composer:focus-within{border-color:var(--accent-hi)}
@@ -877,7 +884,7 @@ var VURL = {}, VLOAD = {}; // such videos already fetched in this view, and the 
 var D = null;         // working copy while signing up / editing
 var N = draft();      // new post draft
 var ui = { view:"boot", mode:"signup", step:0, touched:false, tab:"home", stack:[], rootY:0, ptab:"grid", ltab:"saves", ftab:"following",
-           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0, sheet:null, admin:false, feedMode:"rec", ff:"all", reply:null, side:"", ctab:"posts", dmOk:true, deep:"", etab:"rec", stab:"all", ntab:"all", cq:"", ccat:"all", ncAll:false, dq:"", csort:"old", dmOff:false };
+           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0, sheet:null, admin:false, feedMode:"rec", ff:"all", reply:null, side:"", ctab:"posts", dmOk:true, deep:"", ce:null, etab:"rec", stab:"all", ntab:"all", cq:"", ccat:"all", ncAll:false, dq:"", csort:"old", dmOff:false };
 var app = document.getElementById("app");
 var toastTimer = null, liveTimer = null, popTimer = null, wq = {}, opening = {};
 
@@ -891,7 +898,7 @@ function fromPub(x){
   for (k in b) if (x[k] != null) b[k] = clone(x[k]);
   if (!b.layout || !b.layout.order) b.layout = {order:[], size:{}};
   if (!b.layout.size) b.layout.size = {};
-  b.fields = b.fields.filter(function(id){ return FBY[id]; });
+  b.fields = b.fields.filter(function(id){ return FBY[id] || /^c_[a-z0-9]{6,24}$/.test(id); });
   return b;
 }
 function draft(){ return {items:[], t:"", f:"", cap:false, when:"1y", date:"", song:null, debate:false, topic:"", loc:""}; }
@@ -949,11 +956,74 @@ var I = {
 /* the logo is the app mark the owner supplied: a rounded purple square with two arcs and two moons around a centre */
 var MARK = '<svg class="omark" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#6D5AE6"/><g fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" transform="translate(50 50) scale(1.12) translate(-50 -50)"><path d="M31.3 60.8A21.6 21.6 0 0 1 55.6 29.1"/><path d="M68.7 39.2A21.6 21.6 0 0 1 44.4 70.9"/><circle cx="50" cy="50" r="5.6"/><circle cx="65.3" cy="34.7" r="3.2" stroke-width="3"/><circle cx="34.7" cy="65.3" r="3.2" stroke-width="3"/></g></svg>';
 /* pictures cut from the design (community covers, the home banner): one style class each, so the picture data sits in the page once */
-(function(){
-  var st = document.createElement("style");
-  st.textContent = Object.keys(ART).map(function(k){ return ".cv-" + k + ".cv-" + k + ".cv-" + k + "{background-image:url(" + ART[k] + ")}";   /* the class three times over, so the picture wins wherever the page's own styles sit */ }).join("");
-  document.head.appendChild(st);
-})();
+var artStyle = document.createElement("style");
+document.head.appendChild(artStyle);
+function paintArt(){   /* the class three times over, so the picture wins wherever the page's own styles sit */
+  artStyle.textContent = Object.keys(ART).map(function(k){ return ".cv-" + k + ".cv-" + k + ".cv-" + k + "{background-image:url(" + ART[k] + ")}"; }).join("");
+}
+paintArt();
+/* communities people made themselves. They are kept beside the posts as records marked kind:"comm" (no "at", so the feed never lists them),
+   which lets the existing rules cover them: anyone signed in reads, only the maker changes, the maker or the app's owner removes. */
+var BASE = FIELDS.slice(), CUST = [];
+var CEMO = ["💬","🎮","✈️","🔭","🏝️","📷","🎧","⚽","🚗","🎨","🍳","🎬","🏃","💻","🐶","📚","👟","🌱","🎲","🧩","🎤","🏀","🚲","🧪"];
+var CHUES = [265,235,200,170,130,85,50,25,350,320,295];
+function setCustom(list){
+  CUST.forEach(function(F){ delete FBY[F.id]; delete ART[F.id]; });
+  CUST = list; FIELDS = BASE.concat(CUST);
+  CUST.forEach(function(F){ FBY[F.id] = F; if (F.cover) ART[F.id] = F.cover; });
+  paintArt();
+}
+function customFrom(id, x){
+  /* nothing from a stored record reaches the page unchecked: the id, the colour and the picture have fixed shapes, the words are escaped where they are shown */
+  if (!x || !x.uid || !x.name || !/^c_[a-z0-9]{6,24}$/.test(id)) return null;
+  var name = Array.from(String(x.name)).slice(0, 16).join("");
+  return {id:id, name:name, word:Array.from(name).slice(0, 3).join(""), h:Math.max(0, Math.min(360, +x.h || 265)), d:Array.from(String(x.d || "")).slice(0, 60).join(""),
+          e:Array.from(String(x.e || "💬")).slice(0, 4).join(""), topics:[], tags:[], by:String(x.uid), made:+x.made || 0,
+          cover:/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(x.cover || "") ? x.cover : "", custom:true};
+}
+function myF(){ return S.fields.filter(function(id){ return FBY[id]; }); }   /* my communities that exist right now */
+function commNameError(v, selfId){
+  v = (v || "").trim();
+  if (!v) return "커뮤니티 이름을 입력하세요.";
+  if (len(v) < 2) return "2자 이상 입력하세요.";
+  if (len(v) > 16) return "16자까지 쓸 수 있어요.";
+  var low = v.toLowerCase();
+  if (FIELDS.some(function(F){ return F.id !== selfId && F.name.toLowerCase() === low; })) return "이미 있는 커뮤니티 이름이에요.";
+  return "";
+}
+function newCommHTML(){
+  var c = ui.ce, err = ui.touched ? commNameError(c.name, c.id) : "";
+  var h = '<div class="ccprev"><span class="cover" style="--h:' + c.h + '">' + (c.cover ? '<img src="' + esc(c.cover) + '" alt="고른 표지 사진">' : '<span class="cemo" aria-hidden="true">' + esc(c.e) + "</span>") + "</span></div>";
+  h += '<div class="av-btns"><button class="btn small" data-act="pick" data-t="photo">표지 사진 고르기</button>' + (c.cover ? '<button class="btn small" data-act="cnocover">사진 빼기</button>' : "") + "</div>";
+  h += '<div class="field"><label for="cname">커뮤니티 이름</label><input class="input' + (err ? " bad" : "") + '" id="cname" type="text" maxlength="16" autocomplete="off" placeholder="예: 비행 시뮬레이터" value="' + esc(c.name) + '">' +
+       '<div class="hint"><span class="msg' + (err ? " err" : "") + '" id="cnameMsg" role="status">' + esc(err || "2~16자. 다른 커뮤니티와 겹치지 않는 이름.") + '</span><span class="cnt" id="cnameCnt">' + len(c.name) + "/16</span></div></div>";
+  h += '<div class="field"><label for="cdesc">소개</label><input class="input" id="cdesc" type="text" maxlength="60" autocomplete="off" placeholder="어떤 이야기를 나누는 곳인가요?" value="' + esc(c.d) + '">' +
+       '<div class="hint"><span class="msg">커뮤니티 맨 위에 보여요. 비워 둬도 됩니다.</span></div></div>';
+  h += '<div class="group"><h2 class="h3">아이콘</h2><div class="emos" role="group" aria-label="아이콘">' + CEMO.map(function(e){
+       return '<button class="emo" data-act="cemo" data-v="' + e + '" aria-pressed="' + (c.e === e) + '">' + e + "</button>"; }).join("") + "</div></div>";
+  h += '<div class="group"><h2 class="h3">색</h2><div class="swatches" role="group" aria-label="색">' + CHUES.map(function(x){
+       return '<button class="sw" style="--h:' + x + '" data-act="chue" data-h="' + x + '" aria-pressed="' + (c.h === x) + '" aria-label="색 ' + x + '"></button>'; }).join("") + "</div></div>";
+  h += '<button class="btn primary" style="flex:none" data-act="csave"' + (ui.busy ? " disabled" : "") + ">" + (c.id ? "저장" : "커뮤니티 만들기") + "</button>";
+  return h;
+}
+function saveComm(){
+  var c = ui.ce, name = c.name.trim(), err = commNameError(name, c.id);
+  if (!need() || ui.busy) return;
+  if (err){ ui.touched = true; toast(err); render(true); var ne = document.getElementById("cname"); if (ne) ne.focus(); return; }
+  if (!c.id && CUST.filter(function(F){ return F.by === ME; }).length >= 5){ toast("커뮤니티는 한 사람이 5개까지 만들 수 있어요."); render(true); return; }
+  var isNew = !c.id, id = c.id || "c_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  var doc = {uid:ME, kind:"comm", name:name, d:c.d.trim(), e:c.e, h:c.h, made:c.made || Date.now()};
+  if (c.cover) doc.cover = c.cover;
+  ui.busy = true; render(true);
+  db.doc("posts/" + id).set(doc).then(function(){
+    ui.busy = false;
+    var F = customFrom(id, doc);
+    if (F) setCustom(CUST.filter(function(x){ return x.id !== id; }).concat([F]));   /* shown at once; the stored copy arrives a moment later */
+    if (isNew && !has(S.fields, id)){ S.fields.push(id); saveProfile(); }
+    toast(isNew ? name + " 커뮤니티를 만들었어요." : "커뮤니티 정보를 저장했어요.");
+    closeChat(); ui.stack = []; push({type:"comms"}); push({type:"comm", id:id});
+  }, function(e){ ui.busy = false; werr(e); });
+}
 /* a like sends a few hearts floating up from the button; they live outside the redrawn area so a redraw cannot cut them short */
 function hpop(id){ return ui.hpop && ui.hpop.id === id && Date.now() - ui.hpop.at < 450 ? " pop" : ""; }
 function burst(sel){
@@ -1294,8 +1364,10 @@ function commHTML(f){
   h += '<div><div class="ptabs" role="tablist">' + [["posts","게시물"],["debate","토론"],["people","멤버"],["info","정보"]].map(function(x){
         return '<button role="tab" data-act="ctab" data-t="' + x[0] + '" aria-selected="' + (t === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
   if (t === "people") h += mem.length ? '<div class="ulist" style="padding-top:8px">' + mem.map(who).map(userRow).join("") + "</div>" : '<div class="empty"><b>아직 멤버가 없어요</b><span>가입하면 첫 멤버가 됩니다.</span></div>';
-  else if (t === "info") h += '<div class="pad group about"><div class="group"><h2 class="h3">이런 이야기를 나눠요</h2><div class="chips">' + F.topics.map(function(x){ return '<span class="chip static">' + esc(x) + "</span>"; }).join("") + "</div></div>" +
-      '<div class="group"><h2 class="h3">자주 쓰는 주제</h2><div class="chips">' + F.tags.map(function(x){ return '<button class="chip" data-act="tag" data-q="' + esc(x) + '">' + esc(x) + "</button>"; }).join("") + "</div></div>" +
+  else if (t === "info") h += '<div class="pad group about">' +
+      (F.custom ? '<div class="group"><h2 class="h3">만든 사람</h2><div class="ulist" style="margin-inline:-16px">' + userRow(who(F.by)) + "</div>" + (F.made ? '<p class="muted small">' + longDate(F.made) + "에 만듦</p>" : "") + "</div>" : "") +
+      (F.topics.length ? '<div class="group"><h2 class="h3">이런 이야기를 나눠요</h2><div class="chips">' + F.topics.map(function(x){ return '<span class="chip static">' + esc(x) + "</span>"; }).join("") + "</div></div>" : "") +
+      (F.tags.length ? '<div class="group"><h2 class="h3">자주 쓰는 주제</h2><div class="chips">' + F.tags.map(function(x){ return '<button class="chip" data-act="tag" data-q="' + esc(x) + '">' + esc(x) + "</button>"; }).join("") + "</div></div>" : "") +
       '<p class="muted small">멤버 ' + mem.length + "명 · 게시물 " + posts.length + "개 · 토론 " + deb.length + "개</p></div>";
   else {
     var list = t === "debate" ? deb : posts;
@@ -1451,6 +1523,9 @@ function sheetHTML(){
     if (ui.admin) h += sbtn("s-delc", "관리자 권한으로 댓글 삭제", ' data-id="' + esc(sh.pid) + '" data-c="' + esc(sh.cid) + '"', true);
   } else if (sh.k === "comm"){
     h += sbtn("cwrite", "이 커뮤니티에 글쓰기", ' data-id="' + esc(sh.id) + '"') + sbtn("cdebate", "토론방 만들기", ' data-id="' + esc(sh.id) + '"');
+    var SF = FBY[sh.id];
+    if (SF && SF.custom && SF.by === ME) h += sbtn("cedit", "커뮤니티 정보 수정", ' data-id="' + esc(sh.id) + '"');
+    if (SF && SF.custom && (SF.by === ME || ui.admin)) h += sbtn("cdel", SF.by === ME ? "커뮤니티 삭제" : "관리자 권한으로 커뮤니티 삭제", ' data-id="' + esc(sh.id) + '"', true);
   } else if (sh.k === "why"){
     h += '<p class="stitle">신고하는 이유를 골라 주세요</p>' + REASONS.map(function(r, i){ return sbtn("s-why", r, ' data-i="' + i + '"'); }).join("");
   } else if (sh.k === "sure"){
@@ -1567,13 +1642,14 @@ function stepBody(){
   } else if (s === 2){
     var n = D.fields.length, bad = ui.touched && n < MIN_FIELDS;
     h += '<div><h1 class="h1">무엇에 관심이 있나요?</h1><p class="sub">고른 분야의 게시물을 먼저 보여 드려요. <span class="count' + (bad ? " err" : "") + '">' + MIN_FIELDS + "개 이상 고르세요 · 지금 " + n + "개</span></p></div>";
-    h += '<div class="picker">' + FIELDS.map(function(f){
+    h += '<div class="picker">' + BASE.map(function(f){
       return '<button class="pick" style="--h:' + f.h + '" data-act="field" data-id="' + f.id + '" aria-pressed="' + has(D.fields, f.id) + '"><span class="dot"></span><span>' + esc(f.name) + '</span><span class="ck" aria-hidden="true">✓</span></button>'; }).join("") + "</div>";
   } else {
-    var tags = []; D.fields.forEach(function(id){ FBY[id].tags.forEach(function(t){ tags.push({t:t, f:FBY[id]}); }); });
+    var mineD = D.fields.filter(function(id){ return FBY[id]; });
+    var tags = []; mineD.forEach(function(id){ FBY[id].tags.forEach(function(t){ tags.push({t:t, f:FBY[id]}); }); });
     var all = tags.every(function(x){ return has(D.follows, x.t); });
     h += '<div><h1 class="h1">좋아하는 주제를 골라 보세요</h1><p class="sub">자세히 고를수록 추천이 정확해져요. 건너뛰어도 됩니다.</p></div>';
-    D.fields.forEach(function(id){
+    mineD.filter(function(id){ return FBY[id].topics.length; }).forEach(function(id){
       var f = FBY[id];
       h += '<div class="group"><h2 class="h3">' + esc(f.name) + '</h2><div class="chips">' + f.topics.map(function(t){
         return '<button class="chip" data-act="topic" data-v="' + esc(t) + '" aria-pressed="' + has(D.topics, t) + '">' + esc(t) + "</button>"; }).join("") + "</div></div>";
@@ -1615,7 +1691,7 @@ function homeHTML(){
   h += '<section class="group"><div class="rowhead pad"><h2 class="h2">인기 게시물</h2><button class="iconbtn sm" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></div>" +
        '<div class="pad">' + tabsHTML("fmode", m, [["rec","추천순"],["new","최신순"],["hot","인기순"],["fol","팔로잉"]]) + "</div>" +
        '<div class="chips rowx" role="group" aria-label="관심사로 보기"><button class="chip" data-act="ff" data-id="all" aria-pressed="' + (ui.ff === "all") + '">전체</button>' +
-       S.fields.map(function(id){ return '<button class="chip" data-act="ff" data-id="' + id + '" aria-pressed="' + (ui.ff === id) + '">' + esc(FBY[id].name) + "</button>"; }).join("") + "</div>";
+       myF().map(function(id){ return '<button class="chip" data-act="ff" data-id="' + id + '" aria-pressed="' + (ui.ff === id) + '">' + esc(FBY[id].name) + "</button>"; }).join("") + "</div>";
   h += fd.length ? plist(fd)
                  : '<div class="empty"><b>' + (m === "fol" ? "팔로우한 사람의 글이 아직 없어요" : ui.ff !== "all" ? "이 관심사의 글이 아직 없어요" : "아직 올라온 게시물이 없어요") + "</b><span>" +
                    (m === "fol" ? "사람을 팔로우하면 그 사람의 글만 여기에 모입니다." : hidden ? "추천 조절로 숨긴 게시물만 있어요." : "첫 게시물을 올려 보세요. 다른 사람이 올리면 여기에 바로 나타납니다.") + "</span>" +
@@ -1728,7 +1804,7 @@ function newHTML(){
     if (N.when === "date") h += '<input class="input sm" type="date" id="ndate" aria-label="여는 날짜" min="' + isoDay(1) + '" value="' + esc(N.date) + '">';
     h += '<p class="muted small">' + (at ? longDate(at) + "에 열립니다. " : "내일 이후 날짜를 고르세요. ") + "그날까지는 나만 볼 수 있고, 열리는 날 모두의 홈에 나타납니다.</p></div>";
   }
-  var all = !!ui.ncAll, fs = all ? FIELDS.map(function(F){ return F.id; }) : S.fields.filter(function(id){ return id !== "etc"; }).concat(["etc"]);
+  var all = !!ui.ncAll, fs = all ? FIELDS.map(function(F){ return F.id; }) : myF().filter(function(id){ return id !== "etc"; }).concat(["etc"]);
   if (N.f && !has(fs, N.f)) fs.unshift(N.f);
   h += '<div class="group"><div class="rowhead"><h2 class="h2">커뮤니티</h2><button class="link sm" data-act="ncall">' + (all ? "내 커뮤니티만" : "전체 보기 ›") + '</button></div><div class="cpick' + (all ? " wrap" : "") + '" role="group" aria-label="올릴 커뮤니티">' + fs.map(function(id){
        var F = FBY[id];
@@ -1872,7 +1948,7 @@ function tuneCount(){
   return (POSTS.length ? "예시와 다른 사람이 올린 게시물 " : "다른 사람이 올린 게시물 ") + tt.total + "개 중 " + tt.shown + "개가 홈에 나옵니다.";
 }
 function tuneHTML(){
-  var order = S.fields.map(function(id){ return FBY[id]; }).concat(FIELDS.filter(function(f){ return !has(S.fields, f.id); }));
+  var order = myF().map(function(id){ return FBY[id]; }).concat(FIELDS.filter(function(f){ return !has(S.fields, f.id); }));
   var h = '<div class="pad"><p class="panel" id="tcount" role="status">' + tuneCount() + "</p></div>";
   h += '<div class="pad group"><h2 class="h3">주제별로 조절</h2><div>' + order.map(function(f){ var v = tw(f.id);
     return '<div class="trow"><label for="tw-' + f.id + '">' + esc(f.name) + '</label><input type="range" id="tw-' + f.id + '" data-f="' + f.id + '" min="0" max="4" step="1" value="' + v + '" aria-valuetext="' + TW[v] + '"><span class="tval' + (v === 0 ? " off" : "") + '" id="tv-' + f.id + '">' + TW[v] + "</span></div>"; }).join("") + "</div></div>";
@@ -1900,7 +1976,11 @@ function appHTML(){
   var c = cur(), sub = ui.stack.length > 0, body, title = "", form = false, bar = "", fab = "", right = "", nu = unread(), du = ui.dmOff ? 0 : dmUnread(), at = activeNav();
   if (c.type === "home"){ body = homeHTML(); }
   else if (c.type === "search"){ body = searchHTML(); title = ui.q.trim() ? "검색" : "탐색"; }
-  else if (c.type === "comms"){ body = commsHTML(); title = "커뮤니티"; }
+  else if (c.type === "comms"){
+    body = commsHTML(); title = "커뮤니티";
+    if (!ui.ro) right = '<button class="iconbtn" data-act="newcomm" aria-label="커뮤니티 만들기">' + I.add + "</button>";
+  }
+  else if (c.type === "newcomm"){ body = newCommHTML(); title = ui.ce && ui.ce.id ? "커뮤니티 수정" : "커뮤니티 만들기"; form = true; }
   else if (c.type === "new"){ body = newHTML(); title = N.debate ? "토론방 만들기" : "게시물 작성"; form = true; }
   else if (c.type === "profile"){ body = profileHTML(ME); title = S.nick; }
   else if (c.type === "user"){
@@ -2021,7 +2101,7 @@ function coverHTML(F){
   /* the picture from the design where there is one; otherwise the liveliest photo posted there; otherwise a drawn cover */
   if (ART[F.id]) return '<span class="cover pic cv-' + F.id + '" style="--h:' + F.h + '">' + cico(F, "onc", true) + "</span>";
   var s = coverOf(F.id);
-  return '<span class="cover" style="--h:' + F.h + '">' + (s ? '<img src="' + esc(s) + '" alt="" loading="lazy">' + cico(F, "onc", true) : '<span class="cemo" aria-hidden="true">' + (F.e || "") + "</span>") + "</span>";
+  return '<span class="cover" style="--h:' + F.h + '">' + (s ? '<img src="' + esc(s) + '" alt="" loading="lazy">' + cico(F, "onc", true) : '<span class="cemo" aria-hidden="true">' + esc(F.e || "") + "</span>") + "</span>";
 }
 function joinBtn(f){
   if (ui.ro) return "";
@@ -2051,6 +2131,7 @@ function commGrid(){
 function commsHTML(){
   return '<div class="pad"><input class="input sm" id="cq" type="search" placeholder="커뮤니티 검색하기..." aria-label="커뮤니티 검색" autocomplete="off" value="' + esc(ui.cq) + '"></div>' +
     '<div class="pad">' + tabsHTML("ccat", ui.ccat, [["all","전체"],["hot","인기"],["new","신규"],["mine","내 커뮤니티"]]) + "</div>" +
+    (ui.ro ? "" : '<div class="pad"><button class="btn small wide" data-act="newcomm">' + I.add + "커뮤니티 만들기</button></div>") +
     '<div id="cres">' + commGrid() + "</div>";
 }
 function chatRows(){
@@ -2123,8 +2204,8 @@ function sideHTML(nu, du){
     '<nav class="snav" aria-label="주 메뉴">' + items.map(function(x){
       return '<button data-act="nav" data-t="' + x[0] + '"' + (at === x[0] ? ' aria-current="page"' : "") + ">" + x[2] + "<span>" + x[1] + "</span>" + (x[3] ? '<span class="badge">' + (x[3] > 9 ? "9+" : x[3]) + "</span>" : "") + "</button>"; }).join("") + "</nav>";
   h += '<div class="smy"><div class="rowhead"><h2 class="h3">My Communities</h2><button class="link sm" data-act="nav" data-t="comms" aria-label="커뮤니티 전체 보기">›</button></div>' +
-    (S.fields.length ? S.fields.slice(0, 6).map(function(f){ return '<button class="srow2" data-act="comm" data-root="1" data-id="' + f + '">' + cico(FBY[f]) + "<span>" + esc(FBY[f].name) + "</span></button>"; }).join("") +
-                       (S.fields.length > 6 ? '<button class="srow2" data-act="nav" data-t="comms"><span class="cdot plus">+</span><span>More</span></button>' : "")
+    (myF().length ? myF().slice(0, 6).map(function(f){ return '<button class="srow2" data-act="comm" data-root="1" data-id="' + f + '">' + cico(FBY[f]) + "<span>" + esc(FBY[f].name) + "</span></button>"; }).join("") +
+                       (myF().length > 6 ? '<button class="srow2" data-act="nav" data-t="comms"><span class="cdot plus">+</span><span>More</span></button>' : "")
                      : '<p class="muted small">가입한 커뮤니티가 여기에 모입니다.</p>') + "</div>";
   h += '<div class="promo"><span class="promoart cv-promo" aria-hidden="true"></span><p>Your interests.<br>Your people.<br>Your orbit.</p></div>';
   h += '<button class="sme" data-act="nav" data-t="profile"' + (at === "profile" ? ' aria-current="page"' : "") + ">" + avatar(S, 34) + '<span class="wt"><b>' + esc(S.nick) + "</b><small>내 프로필</small></span></button>";
@@ -2135,13 +2216,14 @@ function navTo(t){
     if (cur().type === t) return;
     closeChat(); stopSong(); ui.reply = null; ui.stack = [];
     if (t === "notif"){ ui.nseen = SEEN; SEEN = Date.now(); ui.pop = null; savePrivate(); }
+    if (t === "comms"){ ui.cq = ""; ui.ccat = "all"; }   /* the list opens whole, not on the last search */
     push({type:t});
   } else tab(t);
 }
 
 function cico(F, cls, emo){
   var art = !emo && ART[F.id];
-  return '<span class="cdot' + (cls ? " " + cls : "") + (art ? " pic cv-" + F.id : "") + '" style="--h:' + F.h + '" aria-hidden="true">' + (art ? "" : (F.e || "")) + "</span>";
+  return '<span class="cdot' + (cls ? " " + cls : "") + (art ? " pic cv-" + F.id : "") + '" style="--h:' + F.h + '" aria-hidden="true">' + (art ? "" : esc(F.e || "")) + "</span>";
 }
 function commList(){
   var q = ui.cq.trim().toLowerCase(), hit = function(s){ return String(s || "").toLowerCase().indexOf(q) !== -1; }, cat = ui.ccat;
@@ -2346,7 +2428,7 @@ function publish(){
   if (wasDeb && !topic){ toast("토론 주제를 적어 주세요."); render(true); var te = document.getElementById("ntopic"); if (te) te.focus(); return; }
   if (!wasDeb && !N.items.length && !body){ toast("글을 쓰거나 사진·동영상을 골라 주세요."); render(true); return; }
   var text = wasDeb ? topic + (body ? "\n" + body : "") : body;
-  if (wasDeb && !FBY[N.f]) N.f = S.fields[0] || "etc";
+  if (wasDeb && !FBY[N.f]) N.f = myF()[0] || "etc";
   var roomF = N.f;
   var lastMine = RP.filter(function(r){ return r.uid === ME; }).reduce(function(m, r){ return Math.max(m, +r.at || 0); }, 0);
   if (Date.now() - lastMine < 20000){ toast("방금 글을 올렸어요. 잠시 뒤에 다시 올려 주세요."); render(true); return; }
@@ -2427,7 +2509,7 @@ document.addEventListener("click", function(e){
   else if (a === "topic"){ toggle(D.topics, b.dataset.v); render(true); }
   else if (a === "follow"){ toggle(D.follows, b.dataset.v); render(true); }
   else if (a === "followall"){
-    var tags = []; D.fields.forEach(function(x){ tags = tags.concat(FBY[x].tags); });
+    var tags = []; D.fields.forEach(function(x){ if (FBY[x]) tags = tags.concat(FBY[x].tags); });
     D.follows = tags.every(function(t){ return has(D.follows, t); }) ? [] : tags; render(true);
   }
   else if (a === "cancel"){ if (S){ ui.view = "app"; tab("profile"); } else { ui.view = "login"; render(false); } }
@@ -2441,6 +2523,20 @@ document.addEventListener("click", function(e){
   else if (a === "ntab"){ ui.ntab = b.dataset.t; render(false); }
   else if (a === "ccat"){ ui.ccat = b.dataset.v || b.dataset.t; render(true); }
   else if (a === "commore"){ ui.sheet = {k:"comm", id:id}; render(true); }
+  else if (a === "newcomm"){ if (!need() || cur().type === "newcomm") return; ui.ce = {id:"", name:"", d:"", e:"💬", h:265, cover:"", made:0}; ui.touched = false; push({type:"newcomm"}); el = document.getElementById("cname"); if (el) el.focus(); }
+  else if (a === "cedit"){ var EF = FBY[id]; ui.sheet = null; if (!EF || !EF.custom || EF.by !== ME) return; ui.ce = {id:EF.id, name:EF.name, d:EF.d, e:EF.e, h:EF.h, cover:EF.cover, made:EF.made}; ui.touched = false; push({type:"newcomm"}); }
+  else if (a === "cemo"){ ui.ce.e = b.dataset.v; render(true); }
+  else if (a === "chue"){ ui.ce.h = +b.dataset.h; render(true); }
+  else if (a === "cnocover"){ ui.ce.cover = ""; render(true); }
+  else if (a === "csave"){ saveComm(); }
+  else if (a === "cdel"){ ui.sheet = {k:"sure", q:"이 커뮤니티를 삭제할까요? 올라온 글은 지워지지 않고 기타 커뮤니티에 남습니다. 되돌릴 수 없어요.", act:"cdel-yes", yes:"삭제", attrs:' data-id="' + esc(id) + '"'}; render(true); }
+  else if (a === "cdel-yes"){
+    var DF = FBY[id]; ui.sheet = null; if (!DF || !DF.custom) return;
+    db.doc("posts/" + id).delete().catch(werr);
+    setCustom(CUST.filter(function(x){ return x.id !== id; }));
+    if (has(S.fields, id)){ toggleOff(S.fields, id); saveProfile(); }
+    toast(DF.name + " 커뮤니티를 삭제했어요."); closeChat(); ui.stack = []; push({type:"comms"});
+  }
   else if (a === "ncall"){ ui.ncAll = !ui.ncAll; render(true); }
   else if (a === "csort"){ ui.csort = ui.csort === "new" ? "old" : "new"; render(true); }
   else if (a === "clike"){ if (!need()) return; var ck = "c:" + b.dataset.c, cOn = !has(LK[ck] || [], ME); setLike(ck, cOn); render(true); if (cOn) burst('[data-act="clike"][data-c="' + b.dataset.c + '"]'); }
@@ -2477,14 +2573,14 @@ document.addEventListener("click", function(e){
   else if (a === "cjoin"){ if (!need()) return; toggle(S.fields, id); prune(S); saveProfile(); toast(has(S.fields, id) ? FBY[id].name + " 커뮤니티에 가입했어요." : FBY[id].name + " 커뮤니티에서 나왔어요."); render(true); }
   else if (a === "cwrite"){ ui.sheet = null; if (!need()) return; N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } tab("new"); }
   else if (a === "tag"){ ui.q = b.dataset.q || ""; ui.stab = "all"; if (ui.tab !== "search" || ui.stack.length) tab("search"); else render(false); }
-  else if (a === "ndeb"){ N.debate = !N.debate; if (N.debate && !N.f) N.f = S.fields[0] || "etc"; render(true); }
-  else if (a === "nmode"){ N.debate = b.dataset.t === "deb"; if (N.debate && !N.f) N.f = S.fields[0] || "etc"; render(true); if (N.debate){ el = document.getElementById("ntopic"); if (el) el.focus(); } }
+  else if (a === "ndeb"){ N.debate = !N.debate; if (N.debate && !N.f) N.f = myF()[0] || "etc"; render(true); }
+  else if (a === "nmode"){ N.debate = b.dataset.t === "deb"; if (N.debate && !N.f) N.f = myF()[0] || "etc"; render(true); if (N.debate){ el = document.getElementById("ntopic"); if (el) el.focus(); } }
   else if (a === "cdebate"){
     ui.sheet = null;
     if (!need()) return;
     N.debate = true;
     if (id && FBY[id]){ N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } }
-    if (!N.f) N.f = S.fields[0] || "etc";
+    if (!N.f) N.f = myF()[0] || "etc";
     tab("new"); el = document.getElementById("ntopic"); if (el) el.focus();
   }
   else if (a === "vote"){
@@ -2724,6 +2820,14 @@ document.addEventListener("input", function(e){
   else if (t.id === "cq"){ ui.cq = t.value; el = document.getElementById("cres"); if (el) el.innerHTML = commGrid(); }
   else if (t.id === "dq"){ ui.dq = t.value; el = document.getElementById("dres"); if (el) el.innerHTML = chatRows(); }
   else if (t.id === "nloc"){ N.loc = t.value; }
+  else if (t.id === "cname"){
+    ui.ce.name = t.value; ui.touched = true;
+    var ce = t.value.trim() ? commNameError(t.value, ui.ce.id) : "", cm = document.getElementById("cnameMsg");
+    if (cm){ cm.textContent = ce || "2~16자. 다른 커뮤니티와 겹치지 않는 이름."; cm.className = "msg" + (ce ? " err" : ""); }
+    el = document.getElementById("cnameCnt"); if (el) el.textContent = len(t.value) + "/16";
+    t.classList.toggle("bad", !!ce);
+  }
+  else if (t.id === "cdesc"){ ui.ce.d = t.value; }
   else if (t.id === "ntopic"){ N.topic = t.value; el = document.getElementById("topicCnt"); if (el) el.textContent = len(t.value) + "/60"; }
   else if (t.id === "fq"){ ui.fq = t.value; el = document.getElementById("flist"); if (el) el.innerHTML = followList(); }
 });
@@ -2736,6 +2840,10 @@ document.addEventListener("change", function(e){
   if (t.id === "photo"){
     var f = t.files[0];
     if (!/^image\//.test(f.type)){ toast("이미지 파일만 올릴 수 있어요."); render(true); return; }
+    if (ui.view === "app" && cur().type === "newcomm"){   /* a cover for a community being made */
+      shrink(f, 480, 0.72, true).then(function(r){ ui.ce.cover = r.data; render(true); }, function(){ toast("사진을 읽지 못했어요. 다른 파일로 다시 시도하세요."); render(true); });
+      return;
+    }
     shrink(f, 256, 0.85, true).then(function(r){ D.photo = r.data; render(true); }, function(){ toast("사진을 읽지 못했어요. 다른 파일로 다시 시도하세요."); render(true); });
   } else if (t.id === "np"){ addFiles(t.files); }
 });
@@ -2767,7 +2875,7 @@ function subscribe(){
     live();
   }, serr);
   db.collection("posts").orderBy("at", "desc").limit(300).onSnapshot(function(s){
-    RP = s.docs.filter(function(d){ var x = d.data(); return x && x.kind !== "chunk" && x.uid; }).map(function(d){ var x = clone(d.data()); x.id = d.id; return x; });
+    RP = s.docs.filter(function(d){ var x = d.data(); return x && !x.kind && x.uid; }).map(function(d){ var x = clone(d.data()); x.id = d.id; return x; });
     live();
   }, serr);
   db.collection("likes").limit(1000).onSnapshot(function(s){
@@ -2793,6 +2901,12 @@ function subscribe(){
     });
     CAPS = caps; if (ui.view === "app") openDue(); live();
   }, serr);
+  db.collection("posts").where("kind", "==", "comm").onSnapshot(function(s){
+    var list = [];
+    s.docs.forEach(function(d){ var F = customFrom(d.id, d.data()); if (F) list.push(F); });
+    list.sort(function(a, b){ return a.made - b.made; });
+    setCustom(list); live();
+  }, function(){});
   if (ME !== "guest" && !ui.ro && !ui.dmOff) subChats();
   var dl = /#p=([A-Za-z0-9]+)/.exec(location.hash || ""); if (dl) ui.deep = dl[1];
 }
