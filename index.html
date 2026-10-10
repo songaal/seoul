@@ -6,7 +6,7 @@
 <title>Orbit</title>
 <meta name="description" content="관심사로 이어지는 SNS">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#0B0A1E">
+<meta name="theme-color" content="#2E2A98">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Orbit">
@@ -26,26 +26,27 @@ img{max-width:100%}
    Wide screens: menu on the left, the screen in the middle, my card and trends on the right.
    Every interest owns a hue (--h); it colours its planet, its tiles and its dots. */
 :root{
-  --bg:#05040F;
-  --surface:#0B0A1E;
-  --surface-2:#141332;
-  --surface-3:#1E1C47;
-  --ink:#F3F2FF;
-  --ink-2:#A9A6CC;
-  --line:#27254F;
-  --accent:#6D5AE6;
-  --accent-hi:#A99CFF;
+  --bg:#4A3BC8;
+  --surface:#2E2D96;
+  --surface-2:rgba(255,255,255,.09);
+  --surface-3:rgba(255,255,255,.17);
+  --ink:#FFFFFF;
+  --ink-2:#CDD0F7;
+  --line:rgba(255,255,255,.17);
+  --accent:#7A5CF0;
+  --accent-hi:#D2C8FF;
   --accent-ink:#FFFFFF;
-  --accent-soft:#201C52;
-  --danger:#FF8F87;
-  --ok:#57D9A3;
-  --heart:#FF6B9A;
+  --grad:linear-gradient(90deg,#7A5CF0,#4F6BE6);
+  --accent-soft:rgba(150,130,255,.3);
+  --danger:#FFB4AC;
+  --ok:#74EBBD;
+  --heart:#FF86B4;
   --tile-l:52%;
   --tile-c:0.15;
   --tile-ink:#FFFFFF;
-  --stage:#03030A;
-  --scrim:rgba(3,3,10,.68);
-  --shadow:0 16px 40px rgba(0,0,0,.55);
+  --stage:#17145A;
+  --scrim:rgba(20,14,84,.62);
+  --shadow:0 20px 50px rgba(22,12,100,.45);
   --stars:radial-gradient(1px 1px at 8% 18%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 22% 72%,rgba(255,255,255,.8) 50%,transparent 51%),
           radial-gradient(1px 1px at 37% 34%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 52% 12%,#fff 50%,transparent 51%),
           radial-gradient(1px 1px at 63% 58%,rgba(255,255,255,.75) 50%,transparent 51%),radial-gradient(1px 1px at 74% 26%,rgba(255,255,255,.6) 50%,transparent 51%),
@@ -58,7 +59,9 @@ img{max-width:100%}
 
 html,body{height:100%}
 body{margin:0;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%;
-  background:radial-gradient(1100px 620px at 85% -10%,rgba(109,90,230,.24),transparent 62%),radial-gradient(900px 520px at -10% 110%,rgba(64,48,170,.26),transparent 62%),var(--bg);background-attachment:fixed}
+  background:radial-gradient(60% 50% at 10% 6%,rgba(226,130,255,.6),transparent 62%),radial-gradient(55% 45% at 90% 10%,rgba(120,176,255,.6),transparent 62%),
+    radial-gradient(60% 55% at 84% 96%,rgba(182,118,255,.55),transparent 62%),radial-gradient(50% 50% at 8% 92%,rgba(92,150,255,.55),transparent 62%),
+    linear-gradient(135deg,#6444DC,#4A5FE2 55%,#7350DE);background-attachment:fixed}
 *{box-sizing:border-box}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;padding:0}
@@ -599,7 +602,7 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
   .npop{left:auto;right:24px;top:80px;width:360px}
   .sheet{left:50%;right:auto;bottom:50%;transform:translate(-50%,50%);width:min(400px,92%);border-radius:20px;border-bottom:1px solid var(--line);padding:12px}
 }
-@media (min-width:1240px){
+@media (min-width:1400px){
   .shell.appv .rail{display:flex}
   .rail{width:310px;flex:none;flex-direction:column;gap:14px;padding:20px 16px;border-left:1px solid var(--line);overflow-y:auto;scrollbar-width:none}
   .card{border:1px solid var(--line);border-radius:16px;background:var(--surface-2);padding:14px;display:flex;flex-direction:column;gap:12px}
@@ -611,6 +614,100 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
   .trend:hover{background:var(--surface-3)}
   .spark{width:56px;height:20px;flex:none;fill:none;stroke:var(--accent-hi);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
   .card .avw .on{border-color:var(--surface-2)}
+}
+
+/* ---------- glass look: bright violet-blue sky, translucent panels, gradient buttons ---------- */
+.shell{background:linear-gradient(165deg,#30279A 0%,#2B349E 55%,#2F2C96 100%)}
+@media (min-width:500px){.shell{height:calc(100% - 28px);top:14px;border:1px solid rgba(255,255,255,.24);border-radius:26px;box-shadow:0 30px 80px rgba(24,12,110,.45)}}
+.bar,.nav{background:rgba(34,30,124,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.btn.primary,.fbtn,.sendbtn,.fab,.nav .plus span,.seg button[aria-selected="true"],.chip[aria-pressed="true"],.rank,.bub2.me,.ndot,.plusbtn{background:var(--grad);color:#fff}
+.fbtn[aria-pressed="true"]{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
+.chip[aria-pressed="true"]{border-color:transparent}
+.btn.primary{border-radius:999px;box-shadow:0 10px 26px rgba(70,60,220,.45)}
+.btn.small{border-radius:999px}
+.input,.textarea{border-color:rgba(255,255,255,.2)}
+.input.sm{border-radius:999px;padding-inline:16px}
+.input:focus,.textarea:focus{border-color:var(--accent-hi)}
+.sheet{background:#33359E}
+.npop{background:#3C3EAC;border-color:rgba(255,255,255,.4)}
+.toast{color:#1B1670}
+.btn.danger{color:#3A0A06}
+.ptabs{border-bottom:0;gap:6px;padding-inline:16px}
+.ptabs button{min-height:38px;border-bottom:0;margin:0;border-radius:999px}
+.ptabs button[aria-selected="true"]{background:rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+.hero{border-color:rgba(255,255,255,.28);background:var(--stars),radial-gradient(120% 150% at 86% 30%,#9A6BFF 0%,#6A45E6 32%,#4233BE 66%,#2F2C9C 100%)}
+.hero::after{content:"";position:absolute;right:-80px;top:50%;width:330px;height:150px;margin-top:-75px;border:1px solid rgba(255,255,255,.3);border-radius:50%;transform:rotate(-14deg);pointer-events:none}
+.planet{background:radial-gradient(circle at 32% 28%,#F3E8FF 0%,#BDA2FF 24%,#735CF0 56%,#3A2EB2 100%);
+  box-shadow:0 0 calc(var(--ps)*.45) rgba(176,146,255,.65),inset calc(var(--ps)*-.1) calc(var(--ps)*-.12) calc(var(--ps)*.26) rgba(30,18,120,.6)}
+.pcover{background:var(--stars),radial-gradient(120% 160% at 78% 10%,#9A6BFF 0%,#5B42DC 42%,#3B34B0 80%,#2F2C9C 100%)}
+.splash{background:var(--stars),radial-gradient(90% 60% at 50% 0%,rgba(196,156,255,.5),transparent 70%)}
+.pcimg{order:2}
+.cnav,.ccount,.vbadge,.multi,.thumb .x{background:rgba(22,18,96,.78)}
+.nrow.new{border-color:rgba(255,255,255,.5)}
+.vbtn{background:rgba(255,255,255,.06)}
+.prow .ring,.prow .ring.on{background:#2E2D96;border-color:#2E2D96}
+.avw .on{border-color:#2E2D96}
+.gbar .chip{background:rgba(255,255,255,.08)}
+.splay{color:#2B2A86}
+.onlyd{display:none}
+.nav button{position:relative}
+.nav .ndot{top:6px;right:calc(50% - 24px)}
+/* communities */
+.cgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cover{aspect-ratio:1/.9;background:var(--stars),linear-gradient(165deg,oklch(72% .14 var(--h)) 0%,oklch(54% .18 var(--h)) 55%,oklch(40% .16 calc(var(--h) + 25)) 100%)}
+.crow2 .cover{aspect-ratio:4/3}
+.cemo{position:absolute;inset:0;display:grid;place-items:center;font-size:42px;line-height:1;filter:drop-shadow(0 8px 14px rgba(20,10,90,.45))}
+.ccb{padding:8px 8px 10px;gap:8px}
+.ccn b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ccn small{color:var(--ink-2);font-weight:500;font-size:11.5px}
+.ccb .fbtn{min-width:0;min-height:32px;padding:0 6px;font-size:12.5px}
+.cdot{--cs:22px;width:var(--cs);height:var(--cs);font-size:calc(var(--cs)*.56);line-height:1;
+  background:radial-gradient(circle at 30% 25%,oklch(86% .09 var(--h)),oklch(62% .17 var(--h)) 55%,oklch(44% .16 var(--h)));box-shadow:inset 0 0 0 1px rgba(255,255,255,.32)}
+.cdot.lg{--cs:56px;width:var(--cs);height:var(--cs);box-shadow:0 0 0 3px rgba(255,255,255,.55),0 8px 20px rgba(20,10,90,.35)}
+.cdot.xl{--cs:54px}
+.trow2 .cdot{--cs:40px;width:var(--cs);height:var(--cs)}
+.cdot.onc{position:absolute;left:8px;bottom:8px;--cs:28px;box-shadow:0 0 0 2px rgba(255,255,255,.8)}
+.cdot.plus{background:rgba(255,255,255,.14);box-shadow:none}
+.chero .onc{display:none}
+.chero .cemo{font-size:80px}
+.cmeta{margin-top:-30px;position:relative;align-items:flex-end}
+.cbtns{display:flex;gap:8px;align-items:center}
+.cbtns .fbtn{flex:1;min-height:42px;font-size:14px}
+.iconbtn.sq{border-radius:14px;border:1px solid var(--line);background:var(--surface-2);width:42px;height:42px}
+.plusbtn{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center}
+.plusbtn svg.i{width:18px;height:18px;stroke-width:2.4}
+.cnts{display:flex!important;align-items:center;gap:4px}
+.cnts svg.i{width:13px;height:13px}
+.cnts span{margin-right:6px}
+.nty{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;background:rgba(255,255,255,.13);color:var(--accent-hi)}
+.nty svg.i{width:14px;height:14px;stroke-width:2.2}
+.nty.like{color:var(--heart)}
+.nty.like svg.i{fill:currentColor}
+/* writing a post */
+.composer{border:1.5px solid rgba(255,255,255,.2);border-radius:18px;background:var(--surface-2);overflow:hidden}
+.composer:focus-within{border-color:var(--accent-hi)}
+.composer .textarea{border:0;background:none;border-radius:0;min-height:130px;resize:none;display:block}
+.composer .tools{padding:4px 8px 10px;gap:4px}
+.composer .tool{border:0;background:none;min-height:58px}
+.composer .tool[aria-pressed="true"]{background:var(--accent-soft)}
+.cpick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding:4px 16px}
+.cpick.wrap{flex-wrap:wrap;overflow:visible}
+.cpick button{flex:none;width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 2px;border-radius:14px;font-size:12px;color:var(--ink-2)}
+.cpick button span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cpick button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--ink)}
+.cpick button[aria-pressed="true"] .cdot{box-shadow:0 0 0 3px #fff}
+@media (min-width:1000px){
+  .shell.appv{max-width:1380px;width:calc(100% - 28px);background:linear-gradient(165deg,rgba(48,40,160,.74),rgba(40,52,166,.74));backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
+  .snav button[aria-current="page"]{background:rgba(255,255,255,.17);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+  .tsearch{border-radius:999px}
+  .onlyd{display:grid}
+  .onlym{display:none}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+  .cover{aspect-ratio:4/3}
+  .promo{border-color:rgba(255,255,255,.24);background:var(--stars),radial-gradient(130% 120% at 80% 0%,#8A5BFF 0%,#4B38CC 50%,#30299C 100%)}
+  .pcimg{width:210px;height:128px}
+  .hero::after{width:520px;height:230px;margin-top:-115px;right:-120px}
+  .cpick{margin-inline:0;padding-inline:0}
 }
 
 @media (prefers-reduced-motion:no-preference){
@@ -688,24 +785,24 @@ window.SONG_SEARCH = function(q){
 
 /* ---------- data ---------- */
 var FIELDS = [
-  {id:"air",    name:"항공·우주",   word:"항공",   h:235, d:"항공기와 공항, 우주 탐사 이야기", topics:["항공기","공항·비행 후기","우주 탐사","밀리터리","비행 시뮬레이터"], tags:["#항공기","#우주"]},
-  {id:"game",   name:"게임",       word:"게임",   h:295, d:"게임 소식과 공략, 같이 할 친구 찾기", topics:["게임 공략","게임 뉴스","e스포츠","인디 게임","게임 친구 찾기"], tags:["#오늘의플레이","#게임추천"]},
-  {id:"sci",    name:"과학·기술",   word:"과학",   h:200, d:"과학 소식과 새 기술, 궁금한 것들", topics:["우주·천문","AI","로봇","과학 실험","IT 기기"], tags:["#과학","#AI"]},
-  {id:"travel", name:"여행",       word:"여행",   h:220, d:"다녀온 곳과 가고 싶은 곳", topics:["국내 여행","해외 여행","제주도","캠핑","여행 꿀팁"], tags:["#제주도여행","#주말여행"]},
-  {id:"photo",  name:"사진",       word:"사진",   h:25,  d:"찍은 사진과 찍는 방법", topics:["사진 공유","촬영 방법","카메라 이야기","필름 사진","풍경 사진"], tags:["#오늘의하늘","#필름사진"]},
-  {id:"music",  name:"음악",       word:"음악",   h:350, d:"요즘 듣는 노래와 공연 이야기", topics:["K-POP","인디 음악","플레이리스트","공연·페스티벌","악기 연주"], tags:["#이번주노래","#플레이리스트"]},
-  {id:"soccer", name:"축구",       word:"축구",   h:150, d:"경기 이야기와 주말 풋살", topics:["경기 결과","선수 이야기","K리그","해외 축구","풋살"], tags:["#주말풋살","#직관인증"]},
-  {id:"car",    name:"자동차",     word:"자동차", h:255, d:"신차 소식과 드라이브 코스", topics:["신차 소식","전기차","드라이브 코스","세차·관리","모터스포츠"], tags:["#드라이브코스","#내차소개"]},
-  {id:"art",    name:"미술·디자인", word:"미술",   h:310, d:"그린 것, 만든 것, 본 전시", topics:["드로잉","디지털 아트","디자인","전시","공예"], tags:["#그림","#디자인"]},
-  {id:"food",   name:"요리",       word:"요리",   h:50,  d:"집밥 레시피와 맛집", topics:["집밥 레시피","베이킹","맛집 탐방","카페","간편 요리"], tags:["#오늘뭐먹지","#집밥기록"]},
-  {id:"movie",  name:"영화·드라마", word:"영화",   h:320, d:"본 것, 볼 것, 추천하는 것", topics:["영화 추천","드라마 정주행","애니메이션","다큐멘터리","영화 리뷰"], tags:["#영화추천","#정주행"]},
-  {id:"fit",    name:"운동",       word:"운동",   h:130, d:"오늘 한 운동과 기록", topics:["헬스","러닝","홈트레이닝","등산","자전거"], tags:["#오운완","#러닝기록"]},
-  {id:"code",   name:"프로그래밍", word:"코딩",   h:190, d:"만드는 것과 배우는 것", topics:["웹 개발","앱 개발","AI·데이터","개발 자료","사이드 프로젝트"], tags:["#개발일기","#사이드프로젝트"]},
-  {id:"home",   name:"인테리어",   word:"집",     h:85,  d:"방 꾸미기와 정리", topics:["방 꾸미기","가구","식물 키우기","정리·수납","셀프 인테리어"], tags:["#방꾸미기","#자취방"]},
-  {id:"pet",    name:"반려동물",   word:"반려",   h:5,   d:"같이 사는 동물 이야기", topics:["강아지","고양이","산책 코스","훈련 팁","간식 만들기"], tags:["#우리집강아지","#고양이일상"]},
-  {id:"book",   name:"독서",       word:"독서",   h:275, d:"읽은 책과 밑줄 그은 문장", topics:["소설","에세이","자기계발","책 추천","독서 모임"], tags:["#책추천","#독서기록"]},
-  {id:"style",  name:"패션",       word:"패션",   h:340, d:"오늘의 코디와 쇼핑 정보", topics:["데일리 코디","스니커즈","빈티지","쇼핑 정보","액세서리"], tags:["#오늘의코디","#빈티지"]},
-  {id:"etc",    name:"기타",       word:"기타",   h:110, d:"어디에도 속하지 않는 이야기", topics:["일상","잡담","질문","정보 공유","아무 이야기"], tags:["#일상","#아무말"]}
+  {id:"air", e:"✈️",    name:"항공·우주",   word:"항공",   h:235, d:"항공기와 공항, 우주 탐사 이야기", topics:["항공기","공항·비행 후기","우주 탐사","밀리터리","비행 시뮬레이터"], tags:["#항공기","#우주"]},
+  {id:"game", e:"🎮",   name:"게임",       word:"게임",   h:295, d:"게임 소식과 공략, 같이 할 친구 찾기", topics:["게임 공략","게임 뉴스","e스포츠","인디 게임","게임 친구 찾기"], tags:["#오늘의플레이","#게임추천"]},
+  {id:"sci", e:"🔭",    name:"과학·기술",   word:"과학",   h:200, d:"과학 소식과 새 기술, 궁금한 것들", topics:["우주·천문","AI","로봇","과학 실험","IT 기기"], tags:["#과학","#AI"]},
+  {id:"travel", e:"🏝️", name:"여행",       word:"여행",   h:220, d:"다녀온 곳과 가고 싶은 곳", topics:["국내 여행","해외 여행","제주도","캠핑","여행 꿀팁"], tags:["#제주도여행","#주말여행"]},
+  {id:"photo", e:"📷",  name:"사진",       word:"사진",   h:25,  d:"찍은 사진과 찍는 방법", topics:["사진 공유","촬영 방법","카메라 이야기","필름 사진","풍경 사진"], tags:["#오늘의하늘","#필름사진"]},
+  {id:"music", e:"🎧",  name:"음악",       word:"음악",   h:350, d:"요즘 듣는 노래와 공연 이야기", topics:["K-POP","인디 음악","플레이리스트","공연·페스티벌","악기 연주"], tags:["#이번주노래","#플레이리스트"]},
+  {id:"soccer", e:"⚽", name:"축구",       word:"축구",   h:150, d:"경기 이야기와 주말 풋살", topics:["경기 결과","선수 이야기","K리그","해외 축구","풋살"], tags:["#주말풋살","#직관인증"]},
+  {id:"car", e:"🚗",    name:"자동차",     word:"자동차", h:255, d:"신차 소식과 드라이브 코스", topics:["신차 소식","전기차","드라이브 코스","세차·관리","모터스포츠"], tags:["#드라이브코스","#내차소개"]},
+  {id:"art", e:"🎨",    name:"미술·디자인", word:"미술",   h:310, d:"그린 것, 만든 것, 본 전시", topics:["드로잉","디지털 아트","디자인","전시","공예"], tags:["#그림","#디자인"]},
+  {id:"food", e:"🍳",   name:"요리",       word:"요리",   h:50,  d:"집밥 레시피와 맛집", topics:["집밥 레시피","베이킹","맛집 탐방","카페","간편 요리"], tags:["#오늘뭐먹지","#집밥기록"]},
+  {id:"movie", e:"🎬",  name:"영화·드라마", word:"영화",   h:320, d:"본 것, 볼 것, 추천하는 것", topics:["영화 추천","드라마 정주행","애니메이션","다큐멘터리","영화 리뷰"], tags:["#영화추천","#정주행"]},
+  {id:"fit", e:"🏃",    name:"운동",       word:"운동",   h:130, d:"오늘 한 운동과 기록", topics:["헬스","러닝","홈트레이닝","등산","자전거"], tags:["#오운완","#러닝기록"]},
+  {id:"code", e:"💻",   name:"프로그래밍", word:"코딩",   h:190, d:"만드는 것과 배우는 것", topics:["웹 개발","앱 개발","AI·데이터","개발 자료","사이드 프로젝트"], tags:["#개발일기","#사이드프로젝트"]},
+  {id:"home", e:"🛋️",   name:"인테리어",   word:"집",     h:85,  d:"방 꾸미기와 정리", topics:["방 꾸미기","가구","식물 키우기","정리·수납","셀프 인테리어"], tags:["#방꾸미기","#자취방"]},
+  {id:"pet", e:"🐶",    name:"반려동물",   word:"반려",   h:5,   d:"같이 사는 동물 이야기", topics:["강아지","고양이","산책 코스","훈련 팁","간식 만들기"], tags:["#우리집강아지","#고양이일상"]},
+  {id:"book", e:"📚",   name:"독서",       word:"독서",   h:275, d:"읽은 책과 밑줄 그은 문장", topics:["소설","에세이","자기계발","책 추천","독서 모임"], tags:["#책추천","#독서기록"]},
+  {id:"style", e:"👟",  name:"패션",       word:"패션",   h:340, d:"오늘의 코디와 쇼핑 정보", topics:["데일리 코디","스니커즈","빈티지","쇼핑 정보","액세서리"], tags:["#오늘의코디","#빈티지"]},
+  {id:"etc", e:"💬",    name:"기타",       word:"기타",   h:110, d:"어디에도 속하지 않는 이야기", topics:["일상","잡담","질문","정보 공유","아무 이야기"], tags:["#일상","#아무말"]}
 ];
 var FBY = {}; FIELDS.forEach(function(f){ FBY[f.id] = f; });
 
@@ -757,7 +854,7 @@ var VURL = {}, VLOAD = {}; // such videos already fetched in this view, and the 
 var D = null;         // working copy while signing up / editing
 var N = draft();      // new post draft
 var ui = { view:"boot", mode:"signup", step:0, touched:false, tab:"home", stack:[], rootY:0, ptab:"grid", ltab:"saves", ftab:"following",
-           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0, sheet:null, admin:false, feedMode:"rec", ff:"all", reply:null, side:"", ctab:"posts", dmOk:true, deep:"", etab:"rec", stab:"all", ntab:"all", cq:"", ccat:"all", dq:"", csort:"old", dmOff:false };
+           q:"", sf:"all", fq:"", openC:null, confirm:null, toast:"", gedit:false, gsel:null, nd:null, ro:false, busy:false, prog:"", stale:false, spBusy:false, spMsg:"", aiBusy:false, aiMsg:"", ai:[], canImg:false, imgMax:1, car:{}, cshow:{}, sFor:null, sq:"", sres:[], sBusy:false, sMsg:"", playing:null, pop:null, nseen:0, sheet:null, admin:false, feedMode:"rec", ff:"all", reply:null, side:"", ctab:"posts", dmOk:true, deep:"", etab:"rec", stab:"all", ntab:"all", cq:"", ccat:"all", ncAll:false, dq:"", csort:"old", dmOff:false };
 var app = document.getElementById("app");
 var toastTimer = null, liveTimer = null, popTimer = null, wq = {}, opening = {};
 
@@ -818,6 +915,7 @@ var I = {
   chat:   ico('<path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-6.5L8 20.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z"/>'),
   pen:    ico('<path d="M5 19l1-4L16.5 4.5l3 3L9 18z"/><path d="M14.5 6.5l3 3"/>'),
   add:    ico('<path d="M12 5v14M5 12h14"/>'),
+  x:      ico('<path d="M6 6l12 12M18 6L6 18"/>'),
   chev:   ico('<path d="M9 5l7 7-7 7"/>'),
   img:    ico('<rect x="4" y="5" width="16" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M4.5 17l4.5-4 3.5 3 2.5-2 4.5 4"/>'),
   vote:   ico('<path d="M5 20V10M12 20V4M19 20v-7"/>'),
@@ -1129,11 +1227,13 @@ function notifHTML(){
   var h = '<div class="pad">' + tabsHTML("ntab", t, [["all","전체"],["cmt","댓글"],["like","좋아요"],["fol","팔로우"],["post","새 글"]]) + "</div>";
   if (!all.length) return h + '<div class="empty"><b>아직 알림이 없어요</b><span>팔로우한 사람의 새 글, 내 글에 달린 좋아요와 댓글, 새 팔로워를 여기에 알려 드려요.</span><button class="btn small" data-act="nav" data-t="search">사람 찾아보기</button></div>';
   if (!list.length) return h + '<div class="empty"><b>이 종류의 알림은 아직 없어요</b></div>';
+  var tic = {like:I.heart, cmt:I.cmt, reply:I.cmt, fol:I.user, post:I.img};
   return h + '<div class="nlist">' + list.map(function(n){
     var p = n.pid ? getPost(n.pid) : null;
     return '<div class="nrow' + (n.at > ui.nseen ? " new" : "") + '"><button class="cav" data-act="user" data-id="' + esc(n.u) + '" aria-label="' + esc(who(n.u).name) + ' 프로필 보기">' + av(n.u, 40) + "</button>" +
       '<button class="ntext" ' + notifAct(n) + "><span>" + notifLine(n) + "</span><small>" + ago(n.at) + "</small></button>" +
-      (p ? '<button class="nthumb" data-act="post" data-id="' + p.id + '" aria-label="게시물 보기">' + thumbHTML(p) + "</button>" : I.chev) + "</div>"; }).join("") + "</div>";
+      (p && thumbOf(p) ? '<button class="nthumb" data-act="post" data-id="' + p.id + '" aria-label="게시물 보기">' + thumbHTML(p) + "</button>" : "") +
+      '<span class="nty ' + n.type + '" aria-hidden="true">' + (tic[n.type] || I.bell) + "</span></div>"; }).join("") + "</div>";
 }
 function popHTML(){
   var n = ui.pop; if (!n) return "";
@@ -1159,10 +1259,10 @@ function commHTML(f){
   var F = FBY[f]; if (!F) return '<div class="empty"><b>없는 커뮤니티예요</b></div>';
   var mem = members(f), posts = commPosts(f), deb = posts.filter(function(p){ return p.debate; }), t = ui.ctab;
   var h = '<div class="chero">' + coverHTML(F) + "</div>" +
-    '<div class="pad group"><div class="cmeta"><span class="cdot lg" style="--h:' + F.h + '"></span><div class="tt"><div class="pname">' + esc(F.name) + '</div><p class="muted small">멤버 ' + fmt(mem.length) + "명 · 게시물 " + posts.length + "개</p></div></div>" +
+    '<div class="pad group"><div class="cmeta">' + cico(F, "lg") + '<div class="tt"><div class="pname">' + esc(F.name) + '</div><p class="muted small">' + fmt(mem.length) + " 멤버 · 게시물 " + posts.length + "개</p></div></div>" +
     (F.d ? '<p class="pbio">' + esc(F.d) + "</p>" : "") +
-    (ui.ro ? "" : '<div class="two">' + joinBtn(f) + '<button class="btn small" data-act="cwrite" data-id="' + f + '">글쓰기</button></div>') + "</div>";
-  h += '<div><div class="ptabs" role="tablist">' + [["posts","게시물"],["debate","토론방"],["people","멤버"],["info","정보"]].map(function(x){
+    (ui.ro ? "" : '<div class="cbtns">' + joinBtn(f) + '<button class="iconbtn sq" data-act="commore" data-id="' + f + '" aria-label="더보기">' + I.more + "</button></div>") + "</div>";
+  h += '<div><div class="ptabs" role="tablist">' + [["posts","게시물"],["debate","토론"],["people","멤버"],["info","정보"]].map(function(x){
         return '<button role="tab" data-act="ctab" data-t="' + x[0] + '" aria-selected="' + (t === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>";
   if (t === "people") h += mem.length ? '<div class="ulist" style="padding-top:8px">' + mem.map(who).map(userRow).join("") + "</div>" : '<div class="empty"><b>아직 멤버가 없어요</b><span>가입하면 첫 멤버가 됩니다.</span></div>';
   else if (t === "info") h += '<div class="pad group about"><div class="group"><h2 class="h3">이런 이야기를 나눠요</h2><div class="chips">' + F.topics.map(function(x){ return '<span class="chip static">' + esc(x) + "</span>"; }).join("") + "</div></div>" +
@@ -1199,15 +1299,12 @@ function trendFields(){
     return {F:F, mem:members(F.id).length, posts:posts.length, s:week.reduce(function(n, p){ return n + 2 + engage(p); }, 0) + members(F.id).length};
   }).filter(function(x){ return x.s > 0; }).sort(function(a, b){ return b.s - a.s; });
 }
-/* the list beside the community grid: a few broad kinds, each holding one or more communities */
-var CATS = [["all","전체"],["air","항공·우주",["air"]],["game","게임",["game"]],["sci","과학·기술",["sci","code"]],["travel","여행",["travel"]],["media","사진·영상",["photo","movie"]],
-            ["music","음악",["music"]],["sport","스포츠",["soccer","fit"]],["hobby","취미",["car","art","food","home","pet","book","style"]],["etc","기타",["etc"]]];
 function commRowJoin(F){
-  return '<div class="trow2 split"><button class="cgo" data-act="comm" data-id="' + F.id + '"><span class="cdot" style="--h:' + F.h + '"></span><span class="tt"><b>' + esc(F.name) + "</b><small>멤버 " + fmt(members(F.id).length) + "명 · " + esc(F.d || "") + "</small></span></button>" + joinBtn(F.id) + "</div>";
+  return '<div class="trow2 split"><button class="cgo" data-act="comm" data-id="' + F.id + '">' + cico(F) + '<span class="tt"><b>' + esc(F.name) + "</b><small>" + fmt(members(F.id).length) + " 멤버 · " + esc(F.d || "") + "</small></span></button>" + joinBtn(F.id) + "</div>";
 }
 function commRow(x, rank){
-  return '<button class="trow2" data-act="comm" data-id="' + x.F.id + '">' + (rank ? '<span class="rank">' + rank + "</span>" : "") + '<span class="cdot" style="--h:' + x.F.h + '"></span>' +
-    '<span class="tt"><b>' + esc(x.F.name) + "</b><small>멤버 " + fmt(x.mem) + "명 · 게시물 " + x.posts + "개</small></span>" + I.chev + "</button>";
+  return '<button class="trow2" data-act="comm" data-id="' + x.F.id + '">' + (rank ? '<span class="rank">' + rank + "</span>" : "") + cico(x.F) +
+    '<span class="tt"><b>' + esc(x.F.name) + "</b><small>" + fmt(x.mem) + " 멤버 · 게시물 " + x.posts + "개</small></span>" + I.chev + "</button>";
 }
 function exploreHTML(){
   var t = ui.etab, h = '<div class="pad">' + tabsHTML("etab", t, [["rec","추천"],["hot","인기"],["new","최신"],["deb","토론방"],["comm","커뮤니티"]]) + "</div>";
@@ -1231,10 +1328,11 @@ function exploreHTML(){
   h += '<section class="group"><div class="rowhead pad"><h2 class="h2">인기 주제</h2></div>' + (tg.length
       ? '<div class="chips pad">' + tg.map(function(x){ return '<button class="chip" data-act="tag" data-q="' + esc(x.t) + '">' + esc(x.t) + " <small>" + x.n + "</small></button>"; }).join("") + "</div>"
       : '<p class="muted small pad">글에 #주제를 달면 많이 쓰인 주제가 여기에 모입니다.</p>') + "</section>";
-  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">급상승 게시물</h2>' + (tp.length ? '<button class="link sm" data-act="etab" data-t="hot">전체 보기</button>' : "") + "</div>" + (tp.length ? '<div class="nlist">' + tp.map(function(p){
-      return '<button class="trow2" data-act="post" data-id="' + p.id + '"><span class="nthumb">' + thumbHTML(p) + '</span><span class="tt"><b>' + esc(snip(p.t || "사진 게시물", 30)) + "</b><small>" + esc(who(p.a).name) + " · " + ago(ptime(p)) + " · 좋아요 " + (LK[p.id] || []).length + " · 댓글 " + ncm(p.id) + "</small></span>" + I.chev + "</button>"; }).join("") + "</div>"
+  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">급상승 게시물</h2>' + (tp.length ? '<button class="link sm" data-act="etab" data-t="hot">전체 보기 ›</button>' : "") + "</div>" + (tp.length ? '<div class="nlist">' + tp.map(function(p){
+      return '<button class="trow2" data-act="post" data-id="' + p.id + '"><span class="nthumb">' + thumbHTML(p) + '</span><span class="tt"><b>' + esc(snip(titleOf(p)[0] || p.t || "사진 게시물", 30)) + '</b><small class="cnts">' +
+        I.heart + "<span>" + fmt((LK[p.id] || []).length) + "</span>" + I.cmt + "<span>" + fmt(ncm(p.id)) + "</span><span>· " + esc(who(p.a).name) + " · " + ago(ptime(p)) + "</span></small></span></button>"; }).join("") + "</div>"
     : '<p class="muted small pad">최근 일주일 동안 좋아요나 댓글을 받은 글이 여기에 올라옵니다.</p>') + "</section>";
-  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">인기 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기</button></div><div class="crow2">' + featured().slice(0, 8).map(ccard).join("") + "</div></section>";
+  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">인기 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기 ›</button></div><div class="crow2">' + featured().slice(0, 8).map(ccard).join("") + "</div></section>";
   return h;
 }
 
@@ -1322,6 +1420,8 @@ function sheetHTML(){
     h += sbtn("s-report", "댓글 신고하기", ' data-kind="comment" data-id="' + esc(sh.cid) + '" data-u="' + esc(sh.u) + '" data-p="' + esc(sh.pid) + '"');
     h += sbtn("s-block", esc(who(sh.u).name) + "님 차단", ' data-id="' + esc(sh.u) + '"');
     if (ui.admin) h += sbtn("s-delc", "관리자 권한으로 댓글 삭제", ' data-id="' + esc(sh.pid) + '" data-c="' + esc(sh.cid) + '"', true);
+  } else if (sh.k === "comm"){
+    h += sbtn("cwrite", "이 커뮤니티에 글쓰기", ' data-id="' + esc(sh.id) + '"') + sbtn("cdebate", "토론방 만들기", ' data-id="' + esc(sh.id) + '"');
   } else if (sh.k === "why"){
     h += '<p class="stitle">신고하는 이유를 골라 주세요</p>' + REASONS.map(function(r, i){ return sbtn("s-why", r, ' data-i="' + i + '"'); }).join("");
   } else if (sh.k === "sure"){
@@ -1476,11 +1576,11 @@ function stripItem(a){
 }
 function homeHTML(){
   var nt = noteOf(S), tt = tuneTotals(), hidden = tt.total - tt.shown, realN = RP.length, fd = feed(), m = ui.feedMode;
-  var h = '<section class="hero"><div class="herot"><h1>Find Your Community</h1><p>관심사가 같은 사람들과<br>더 넓은 세상을 만나보세요.</p><button class="btn primary" data-act="nav" data-t="comms">지금 탐색하기 →</button></div>' + planet() + "</section>";
+  var h = '<section class="hero"><div class="herot"><h1>Find Your Community</h1><p>관심사가 같은 사람들과<br>더 넓은 세상을 만나보세요.</p><button class="btn primary" data-act="nav" data-t="comms">커뮤니티 둘러보기 →</button></div>' + planet() + "</section>";
   h += '<div class="strip" aria-label="노트와 계정"><button class="me" data-act="note"><span class="bub"><span>' + (nt ? esc(noteText(nt)) : "+ 노트") + "</span></span>" + ring(avatar(S, 56), true) + '<span class="lbl">내 노트</span></button>' +
     people().map(stripItem).join("") + "</div>";
-  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">Featured Communities</h2><button class="link sm" data-act="nav" data-t="comms">See all ›</button></div><div class="crow2">' + featured().slice(0, 8).map(ccard).join("") + "</div></section>";
-  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">Popular Posts</h2><button class="iconbtn sm" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></div>" +
+  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">추천 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기 ›</button></div><div class="crow2">' + featured().slice(0, 8).map(ccard).join("") + "</div></section>";
+  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">인기 게시물</h2><button class="iconbtn sm" data-act="tune" aria-label="추천 조절">' + I.tune + "</button></div>" +
        '<div class="pad">' + tabsHTML("fmode", m, [["rec","추천순"],["new","최신순"],["hot","인기순"],["fol","팔로잉"]]) + "</div>" +
        '<div class="chips rowx" role="group" aria-label="관심사로 보기"><button class="chip" data-act="ff" data-id="all" aria-pressed="' + (ui.ff === "all") + '">전체</button>' +
        S.fields.map(function(id){ return '<button class="chip" data-act="ff" data-id="' + id + '" aria-pressed="' + (ui.ff === id) + '">' + esc(FBY[id].name) + "</button>"; }).join("") + "</div>";
@@ -1569,19 +1669,18 @@ function searchHTML(){
     (ui.q ? '<button class="link" data-act="qclear">취소</button>' : "") + '</div><div id="results">' + searchResults() + "</div>";
 }
 function newHTML(){
-  var canVideo = !!assets || !!vstore, full = N.items.length >= MAX_ITEMS || ui.busy;
-  var h = '<div class="nwho">' + avatar(S, 40) + '<div class="wt"><b>' + esc(S.nick) + "</b><small>" + (N.f && FBY[N.f] ? esc(FBY[N.f].name) + " 커뮤니티에 올림" : "전체 공개") + "</small></div></div>";
+  var canVideo = !!assets || !!vstore, full = N.items.length >= MAX_ITEMS || ui.busy, h = "";
   if (!ui.ro) h += tabsHTML("nmode", N.debate ? "deb" : "post", [["post","게시물"],["deb","토론방"]]);
   if (N.debate) h += '<div class="field"><label for="ntopic">토론 주제</label><input class="input" id="ntopic" type="text" maxlength="60" autocomplete="off" placeholder="예: 게임에 쉬움 난이도는 꼭 있어야 할까?" value="' + esc(N.topic || "") + '">' +
        '<div class="hint"><span class="msg">찬성·반대로 답할 수 있는 한 문장이 좋아요.</span><span class="cnt" id="topicCnt">' + len(N.topic || "") + "/60</span></div></div>";
-  h += '<div class="field"><label' + (N.debate ? "" : ' class="sr-only"') + ' for="cap">' + (N.debate ? "설명" : "글") + '</label><textarea class="textarea" id="cap" maxlength="' + CAP_MAX + '" placeholder="' + (N.debate ? "왜 궁금한지, 어떤 의견이 있는지 적어 주세요. (선택)" : "지금 어떤 생각을 하고 계신가요?") + '">' + esc(N.t) + "</textarea>" +
-       '<div class="hint"><span class="msg">' + (N.debate ? "설명은 비워 둬도 됩니다." : "첫 줄에서 줄을 바꾸면 제목처럼 굵게 보여요.") + '</span><span class="cnt" id="capCnt">' + len(N.t) + "/" + CAP_MAX + "</span></div></div>";
-  h += '<div class="group"><div class="tools" role="group" aria-label="붙이기">' +
+  h += '<div class="field"><label class="sr-only" for="cap">' + (N.debate ? "설명" : "글") + '</label><div class="composer"><textarea class="textarea" id="cap" maxlength="' + CAP_MAX + '" placeholder="' + (N.debate ? "왜 궁금한지, 어떤 의견이 있는지 적어 주세요. (선택)" : "지금 어떤 생각을 하고 계신가요?") + '">' + esc(N.t) + "</textarea>" +
+       '<div class="tools" role="group" aria-label="붙이기">' +
        '<button class="tool" data-act="pick" data-t="np"' + (full ? " disabled" : "") + ">" + I.img + "<span>" + (canVideo ? "사진·동영상" : "사진") + "</span></button>" +
        '<button class="tool" data-act="songopen" data-t="post" aria-pressed="' + !!(N.song || ui.sFor === "post") + '">' + I.note + "<span>노래</span></button>" +
        '<button class="tool" data-act="ndeb" aria-pressed="' + N.debate + '">' + I.vote + "<span>토론방</span></button>" +
-       '<button class="tool" data-act="ncap" aria-pressed="' + N.cap + '">' + I.clock + "<span>타임캡슐</span></button></div>" +
-       '<p class="muted small">' + (canVideo ? "사진·동영상은 " + MAX_ITEMS + "개까지, 동영상은 한 개에 20MB까지 올릴 수 있어요." : "지금 설정에서는 사진만 올릴 수 있어요.") + "</p></div>";
+       '<button class="tool" data-act="ncap" aria-pressed="' + N.cap + '">' + I.clock + "<span>타임캡슐</span></button></div></div>" +
+       '<div class="hint"><span class="msg">' + (N.debate ? "설명은 비워 둬도 됩니다." : "첫 줄에서 줄을 바꾸면 제목처럼 굵게 보여요.") + '</span><span class="cnt" id="capCnt">' + len(N.t) + "/" + CAP_MAX + "</span></div>" +
+       '<p class="muted small" style="margin-top:4px">' + (canVideo ? "사진·동영상은 " + MAX_ITEMS + "개까지, 동영상은 한 개에 20MB까지 올릴 수 있어요." : "지금 설정에서는 사진만 올릴 수 있어요.") + "</p></div>";
   if (N.items.length) h += '<div class="group"><h2 class="h3">사진·동영상 ' + N.items.length + "/" + MAX_ITEMS + '</h2><div class="thumbs">' +
     N.items.map(function(it, i){
       return '<div class="thumb">' + (it.k === "vid" ? '<video src="' + esc(it.url) + '" muted playsinline preload="metadata"></video><span class="vbadge">' + I.play + "</span>" : '<img src="' + esc(it.url) + '" alt="고른 사진 ' + (i + 1) + '">') +
@@ -1597,9 +1696,11 @@ function newHTML(){
     if (N.when === "date") h += '<input class="input sm" type="date" id="ndate" aria-label="여는 날짜" min="' + isoDay(1) + '" value="' + esc(N.date) + '">';
     h += '<p class="muted small">' + (at ? longDate(at) + "에 열립니다. " : "내일 이후 날짜를 고르세요. ") + "그날까지는 나만 볼 수 있고, 열리는 날 모두의 홈에 나타납니다.</p></div>";
   }
-  var fs = S.fields.filter(function(id){ return id !== "etc"; }).concat(["etc"]);
-  h += '<div class="group"><h2 class="h3">커뮤니티</h2><div class="chips">' + fs.map(function(id){
-       return '<button class="chip" data-act="nf" data-id="' + id + '" aria-pressed="' + (N.f === id) + '">' + esc(FBY[id].name) + "</button>"; }).join("") + "</div></div>";
+  var all = !!ui.ncAll, fs = all ? FIELDS.map(function(F){ return F.id; }) : S.fields.filter(function(id){ return id !== "etc"; }).concat(["etc"]);
+  if (N.f && !has(fs, N.f)) fs.unshift(N.f);
+  h += '<div class="group"><div class="rowhead"><h2 class="h2">커뮤니티</h2><button class="link sm" data-act="ncall">' + (all ? "내 커뮤니티만" : "전체 보기 ›") + '</button></div><div class="cpick' + (all ? " wrap" : "") + '" role="group" aria-label="올릴 커뮤니티">' + fs.map(function(id){
+       var F = FBY[id];
+       return '<button data-act="nf" data-id="' + id + '" aria-pressed="' + (N.f === id) + '">' + cico(F, "xl") + "<span>" + esc(F.name) + "</span></button>"; }).join("") + "</div></div>";
   h += '<div class="locf">' + I.pin + '<input class="input sm" id="nloc" type="text" maxlength="30" placeholder="위치 추가 (선택)" aria-label="위치" autocomplete="off" value="' + esc(N.loc || "") + '"></div>';
   h += '<button class="btn primary" style="flex:none" id="pubBtn" data-act="publish"' + (ui.busy ? " disabled" : "") + ">" + (ui.busy ? esc(ui.prog) : (N.cap ? "타임캡슐 묻기" : N.debate ? "토론방 만들기" : "게시하기")) + "</button>";
   return h;
@@ -1764,23 +1865,26 @@ function noteHTML(){
 }
 function cur(){ return ui.stack.length ? ui.stack[ui.stack.length - 1] : {type:ui.tab}; }
 function appHTML(){
-  var c = cur(), sub = ui.stack.length > 0, body, title = "", form = false, bar = "", fab = "", nu = unread(), du = ui.dmOff ? 0 : dmUnread();
+  var c = cur(), sub = ui.stack.length > 0, body, title = "", form = false, bar = "", fab = "", right = "", nu = unread(), du = ui.dmOff ? 0 : dmUnread(), at = activeNav();
   if (c.type === "home"){ body = homeHTML(); }
-  else if (c.type === "search"){ body = searchHTML(); title = "Explore"; }
-  else if (c.type === "comms"){ body = commsHTML(); title = "Communities"; }
-  else if (c.type === "new"){ body = newHTML(); title = N.debate ? "토론방 만들기" : "새 게시물 작성"; form = true; }
+  else if (c.type === "search"){ body = searchHTML(); title = ui.q.trim() ? "검색" : "탐색"; }
+  else if (c.type === "comms"){ body = commsHTML(); title = "커뮤니티"; }
+  else if (c.type === "new"){ body = newHTML(); title = N.debate ? "토론방 만들기" : "게시물 작성"; form = true; }
   else if (c.type === "profile"){ body = profileHTML(ME); title = S.nick; }
-  else if (c.type === "user"){ body = profileHTML(c.id); title = who(c.id).name; }
+  else if (c.type === "user"){
+    body = profileHTML(c.id); title = who(c.id).name;
+    if (!ABY[c.id] && !ui.ro) right = '<button class="iconbtn" data-act="umore" data-id="' + esc(c.id) + '" aria-label="더보기">' + I.more + "</button>";
+  }
   else if (c.type === "follows"){ body = followsHTML(); title = S.nick; }
   else if (c.type === "tune"){ body = tuneHTML(); title = "추천 조절"; }
-  else if (c.type === "notif"){ body = notifHTML(); title = "Notifications"; }
+  else if (c.type === "notif"){ body = notifHTML(); title = "알림"; }
   else if (c.type === "comm"){
     body = commHTML(c.id); title = (FBY[c.id] || {name:""}).name;
     if (FBY[c.id] && !ui.ro) fab = '<button class="fab" data-act="cwrite" data-id="' + c.id + '" aria-label="이 커뮤니티에 글쓰기">' + I.pen + "</button>";
   }
   else if (c.type === "chats"){
-    body = chatsHTML(); title = "Messages";
-    if (!ui.dmOff && ui.dmOk && !ui.ro) fab = '<button class="fab" data-act="newdm" aria-label="새 메시지">' + I.pen + "</button>";
+    body = chatsHTML(); title = "메시지";
+    if (!ui.dmOff && ui.dmOk && !ui.ro) right = '<button class="iconbtn" data-act="newdm" aria-label="새 메시지">' + I.pen + "</button>";
   }
   else if (c.type === "dmpick"){ body = dmPickHTML(); title = "새 메시지"; }
   else if (c.type === "chat"){
@@ -1795,19 +1899,22 @@ function appHTML(){
     body = p ? postCard(p) : '<div class="empty"><b>게시물을 찾을 수 없어요</b><span>삭제됐을 수 있습니다.</span></div>';
     if (p && !ui.ro) bar = cbarHTML(p);
   }
-  var acts = '<span class="topacts">' +
-    (ui.dmOff ? "" : '<button class="iconbtn nbell" data-act="nav" data-t="chats" aria-label="메시지' + (du ? " " + du + "개" : "") + '">' + I.chat + (du ? '<span class="ndot">' + (du > 9 ? "9+" : du) + "</span>" : "") + "</button>") +
-    '<button class="iconbtn nbell" data-act="nav" data-t="notif" aria-label="알림' + (nu ? " " + nu + "개" : "") + '">' + I.bell + (nu ? '<span class="ndot">' + (nu > 9 ? "9+" : nu) + "</span>" : "") + "</button>" +
-    '<button class="iconbtn tav" data-act="nav" data-t="profile" aria-label="내 프로필">' + avatar(S, 32) + "</button></span>";
-  var tsearch = c.type === "search" ? '' : '<form class="tsearch" data-form="tsearch" role="search">' + I.search + '<input id="tq" type="search" data-keep placeholder="Search people, communities, or topics..." aria-label="검색" autocomplete="off"></form>';
-  var top = sub ? '<header class="top deep"><button class="iconbtn" data-act="back" aria-label="뒤로">' + I.back + '</button><div class="ttl">' + esc(title) + "</div>" +
-                   (c.type === "user" && !ABY[c.id] && !ui.ro ? '<button class="iconbtn" data-act="umore" data-id="' + esc(c.id) + '" aria-label="더보기">' + I.more + "</button>" : '<span class="iconbtn" aria-hidden="true"></span>') + "</header>"
+  /* phone: communities and messages up here, alerts in the bottom menu. wide screens: alerts, messages, me */
+  var acts = c.type === "new" ? '<span class="topacts"><button class="iconbtn" data-act="nav" data-t="home" aria-label="닫기">' + I.x + "</button></span>"
+    : '<span class="topacts"><button class="iconbtn onlym" data-act="nav" data-t="comms" aria-label="커뮤니티">' + I.people + "</button>" +
+      '<button class="iconbtn nbell onlyd" data-act="nav" data-t="notif" aria-label="알림' + (nu ? " " + nu + "개" : "") + '">' + I.bell + (nu ? '<span class="ndot">' + (nu > 9 ? "9+" : nu) + "</span>" : "") + "</button>" +
+      (ui.dmOff ? "" : '<button class="iconbtn nbell" data-act="nav" data-t="chats" aria-label="메시지' + (du ? " " + du + "개" : "") + '">' + I.chat + (du ? '<span class="ndot">' + (du > 9 ? "9+" : du) + "</span>" : "") + "</button>") +
+      '<button class="iconbtn tav" data-act="nav" data-t="profile" aria-label="내 프로필">' + avatar(S, 32) + "</button></span>";
+  var tsearch = c.type === "search" ? "" : '<form class="tsearch" data-form="tsearch" role="search">' + I.search + '<input id="tq" type="search" data-keep placeholder="Search people, communities, or topics..." aria-label="검색" autocomplete="off"></form>';
+  var top = sub ? '<header class="top deep"><button class="iconbtn" data-act="back" aria-label="뒤로">' + I.back + '</button><div class="ttl">' + esc(title) + "</div>" + (right || '<span class="iconbtn" aria-hidden="true"></span>') + "</header>"
                 : '<header class="top">' + (title ? '<div class="ttl">' + esc(title) + "</div>" : '<div class="brand">' + MARK + "Orbit</div>") + tsearch + acts + "</header>";
-  var tabs = [["home","홈",I.home],["search","탐색",I.compass],["new","새 게시물",I.add],["comms","커뮤니티",I.people],["profile","내 프로필",I.user]];
+  var tabs = [["home","홈",I.home,0],["search","검색",I.search,0],["new","새 게시물",I.add,0],["notif","알림",I.bell,nu],["profile","내 프로필",I.user,0]];
   return sideHTML(nu, du) + '<div class="col">' + top + (ui.preview ? '<p class="robar">미리보기 모드 · 글과 사진은 이 기기에만 저장되고 다른 사람에게 보이지 않아요.</p>' : "") +
     '<main class="scroll' + (form ? " form" : "") + '">' + body + "</main>" + bar + (bar ? "" : fab) +
     '<nav class="nav" aria-label="주 메뉴">' + tabs.map(function(t){
-      return '<button data-act="nav" data-t="' + t[0] + '" aria-label="' + t[1] + '"' + (t[0] === "new" ? ' class="plus"' : "") + (!sub && ui.tab === t[0] ? ' aria-current="page"' : "") + ">" + (t[0] === "new" ? "<span>" + t[2] + "</span>" : t[2]) + "</button>"; }).join("") + "</nav></div>" + railHTML();
+      var on = t[0] === "notif" ? at === "notif" : !sub && ui.tab === t[0];
+      return '<button data-act="nav" data-t="' + t[0] + '" aria-label="' + t[1] + (t[3] ? " " + t[3] + "개" : "") + '"' + (t[0] === "new" ? ' class="plus"' : "") + (on ? ' aria-current="page"' : "") + ">" +
+        (t[0] === "new" ? "<span>" + t[2] + "</span>" : t[2]) + (t[3] ? '<span class="ndot">' + (t[3] > 9 ? "9+" : t[3]) + "</span>" : "") + "</button>"; }).join("") + "</nav></div>" + railHTML();
 }
 
 /* ---------- Orbit screens ---------- */
@@ -1880,7 +1987,7 @@ function coverOf(f){
 }
 function coverHTML(F){
   var s = coverOf(F.id);
-  return '<span class="cover" style="--h:' + F.h + '">' + (s ? '<img src="' + esc(s) + '" alt="" loading="lazy">' : planet("sm") + '<span class="cword" aria-hidden="true">' + esc(F.word) + "</span>") + "</span>";
+  return '<span class="cover" style="--h:' + F.h + '">' + (s ? '<img src="' + esc(s) + '" alt="" loading="lazy">' + cico(F, "onc") : '<span class="cemo" aria-hidden="true">' + (F.e || "") + "</span>") + "</span>";
 }
 function joinBtn(f){
   if (ui.ro) return "";
@@ -1889,7 +1996,7 @@ function joinBtn(f){
 }
 function ccard(F){
   return '<div class="ccard"><button class="ccov" data-act="comm" data-id="' + F.id + '" aria-label="' + esc(F.name) + ' 커뮤니티 보기">' + coverHTML(F) + "</button>" +
-    '<div class="ccb"><button class="ccn" data-act="comm" data-id="' + F.id + '"><b>' + esc(F.name) + "</b><small>멤버 " + fmt(members(F.id).length) + "명</small><span>" + esc(F.d || "") + "</span></button>" + joinBtn(F.id) + "</div></div>";
+    '<div class="ccb"><button class="ccn" data-act="comm" data-id="' + F.id + '"><b>' + esc(F.name) + "</b><small>" + fmt(members(F.id).length) + " 멤버</small></button>" + joinBtn(F.id) + "</div></div>";
 }
 function featured(){
   /* lively communities first, then the rest in their usual order */
@@ -1898,19 +2005,19 @@ function featured(){
     .sort(function(a, b){ return a.k - b.k; }).map(function(x){ return x.F; });
 }
 function commGrid(){
-  var q = ui.cq.trim().toLowerCase(), hit = function(s){ return String(s || "").toLowerCase().indexOf(q) !== -1; }, cat = ui.ccat, ids = null;
-  CATS.forEach(function(c){ if (c[0] === cat && c[2]) ids = c[2]; });
-  var list = FIELDS.filter(function(F){ return (cat === "mine" ? has(S.fields, F.id) : !ids || has(ids, F.id)) && (!q || hit(F.name) || hit(F.d) || F.topics.some(hit)); });
-  if (!list.length) return '<div class="empty"><b>' + (cat === "mine" && !q ? "아직 가입한 커뮤니티가 없어요" : "찾는 커뮤니티가 없어요") + "</b><span>" + (cat === "mine" && !q ? "전체에서 마음에 드는 곳에 가입해 보세요." : "다른 낱말이나 분야로 찾아 보세요.") + "</span></div>";
-  return '<div class="cgrid pad">' + list.map(ccard).join("") + "</div>";
+  var q = ui.cq.trim(), cat = ui.ccat, list = commList();
+  if (!list.length) return '<div class="empty"><b>' + (cat === "mine" && !q ? "아직 가입한 커뮤니티가 없어요" : "찾는 커뮤니티가 없어요") + "</b><span>" + (cat === "mine" && !q ? "전체에서 마음에 드는 곳에 가입해 보세요." : "다른 낱말로 찾아 보세요.") + "</span></div>";
+  var h = '<div class="cgrid pad">' + list.map(ccard).join("") + "</div>";
+  if (cat === "all" && !q && !ui.ro){
+    var rec = featured().filter(function(F){ return !has(S.fields, F.id); }).slice(0, 3);
+    if (rec.length) h += '<section class="group"><div class="rowhead pad"><h2 class="h2">추천 커뮤니티</h2><button class="link sm" data-act="ccat" data-v="hot">전체 보기 ›</button></div><div class="nlist">' + rec.map(commRowPlus).join("") + "</div></section>";
+  }
+  return h;
 }
 function commsHTML(){
-  var cats = CATS.concat([["mine", "가입한 곳 " + S.fields.length]]);
   return '<div class="pad"><input class="input sm" id="cq" type="search" placeholder="커뮤니티 검색하기..." aria-label="커뮤니티 검색" autocomplete="off" value="' + esc(ui.cq) + '"></div>' +
-    '<div class="cwrap"><div class="ccats" role="group" aria-label="분야">' + cats.map(function(c){
-      var F = c[2] ? FBY[c[2][0]] : null;
-      return '<button class="ccat" data-act="ccat" data-v="' + c[0] + '" aria-pressed="' + (ui.ccat === c[0]) + '">' + (F ? '<span class="cdot" style="--h:' + F.h + '"></span>' : c[0] === "all" ? I.grid : I.user) + "<span>" + esc(c[1]) + "</span></button>"; }).join("") +
-    '</div><div id="cres">' + commGrid() + "</div></div>";
+    '<div class="pad">' + tabsHTML("ccat", ui.ccat, [["all","전체"],["hot","인기"],["new","신규"],["mine","내 커뮤니티"]]) + "</div>" +
+    '<div id="cres">' + commGrid() + "</div>";
 }
 function chatRows(){
   var q = ui.dq.trim().toLowerCase(), list = CHATS.filter(function(c){ return !has(BLOCKS, c.other) && (!q || who(c.other).name.toLowerCase().indexOf(q) !== -1); });
@@ -1973,7 +2080,7 @@ function activeNav(){
   var types = ui.stack.map(function(x){ return x.type; });
   if (has(types, "chats") || has(types, "chat") || has(types, "dmpick")) return "chats";
   if (types[0] === "notif") return "notif";
-  if (types[0] === "comm") return "comms";
+  if (types[0] === "comm" || types[0] === "comms") return "comms";
   return ui.tab;
 }
 function sideHTML(nu, du){
@@ -1982,7 +2089,7 @@ function sideHTML(nu, du){
     '<nav class="snav" aria-label="주 메뉴">' + items.map(function(x){
       return '<button data-act="nav" data-t="' + x[0] + '"' + (at === x[0] ? ' aria-current="page"' : "") + ">" + x[2] + "<span>" + x[1] + "</span>" + (x[3] ? '<span class="badge">' + (x[3] > 9 ? "9+" : x[3]) + "</span>" : "") + "</button>"; }).join("") + "</nav>";
   h += '<div class="smy"><div class="rowhead"><h2 class="h3">My Communities</h2><button class="link sm" data-act="nav" data-t="comms" aria-label="커뮤니티 전체 보기">›</button></div>' +
-    (S.fields.length ? S.fields.slice(0, 6).map(function(f){ return '<button class="srow2" data-act="comm" data-root="1" data-id="' + f + '"><span class="cdot" style="--h:' + FBY[f].h + '"></span><span>' + esc(FBY[f].name) + "</span></button>"; }).join("") +
+    (S.fields.length ? S.fields.slice(0, 6).map(function(f){ return '<button class="srow2" data-act="comm" data-root="1" data-id="' + f + '">' + cico(FBY[f]) + "<span>" + esc(FBY[f].name) + "</span></button>"; }).join("") +
                        (S.fields.length > 6 ? '<button class="srow2" data-act="nav" data-t="comms"><span class="cdot plus">+</span><span>More</span></button>' : "")
                      : '<p class="muted small">가입한 커뮤니티가 여기에 모입니다.</p>') + "</div>";
   h += '<div class="promo">' + planet("sm") + "<p>Your interests.<br>Your people.<br>Your orbit.</p></div>";
@@ -1990,12 +2097,29 @@ function sideHTML(nu, du){
   return h + "</aside>";
 }
 function navTo(t){
-  if (t === "chats" || t === "notif"){
+  if (t === "chats" || t === "notif" || t === "comms"){
     if (cur().type === t) return;
     closeChat(); stopSong(); ui.reply = null; ui.stack = [];
     if (t === "notif"){ ui.nseen = SEEN; SEEN = Date.now(); ui.pop = null; savePrivate(); }
     push({type:t});
   } else tab(t);
+}
+
+function cico(F, cls){ return '<span class="cdot' + (cls ? " " + cls : "") + '" style="--h:' + F.h + '" aria-hidden="true">' + (F.e || "") + "</span>"; }
+function commList(){
+  var q = ui.cq.trim().toLowerCase(), hit = function(s){ return String(s || "").toLowerCase().indexOf(q) !== -1; }, cat = ui.ccat;
+  var list = FIELDS.filter(function(F){ return (cat !== "mine" || has(S.fields, F.id)) && (!q || hit(F.name) || hit(F.d) || F.topics.some(hit)); });
+  if (cat === "hot"){
+    var rank = {}; trendFields().forEach(function(x, i){ rank[x.F.id] = i + 1; });
+    list = list.map(function(F, i){ return {F:F, k:rank[F.id] || 100 + i}; }).sort(function(a, b){ return a.k - b.k; }).map(function(x){ return x.F; });
+  } else if (cat === "new"){   /* the communities where something was posted most recently come first */
+    list = list.map(function(F, i){ var p = commPosts(F.id)[0]; return {F:F, t:p ? ptime(p) : 0, i:i}; }).sort(function(a, b){ return b.t - a.t || a.i - b.i; }).map(function(x){ return x.F; });
+  }
+  return list;
+}
+function commRowPlus(F){
+  return '<div class="trow2 split"><button class="cgo" data-act="comm" data-id="' + F.id + '">' + cico(F) + '<span class="tt"><b>' + esc(F.name) + "</b><small>" + fmt(members(F.id).length) + " 멤버</small></span></button>" +
+    (ui.ro ? "" : '<button class="plusbtn" data-act="cjoin" data-id="' + F.id + '" aria-label="' + esc(F.name) + ' 가입하기">' + I.add + "</button>") + "</div>";
 }
 
 /* ---------- render + navigation ---------- */
@@ -2271,7 +2395,9 @@ document.addEventListener("click", function(e){
   else if (a === "etab"){ ui.etab = b.dataset.t; render(false); }
   else if (a === "stab"){ ui.stab = b.dataset.t; render(false); }
   else if (a === "ntab"){ ui.ntab = b.dataset.t; render(false); }
-  else if (a === "ccat"){ ui.ccat = b.dataset.v; render(true); }
+  else if (a === "ccat"){ ui.ccat = b.dataset.v || b.dataset.t; render(true); }
+  else if (a === "commore"){ ui.sheet = {k:"comm", id:id}; render(true); }
+  else if (a === "ncall"){ ui.ncAll = !ui.ncAll; render(true); }
   else if (a === "csort"){ ui.csort = ui.csort === "new" ? "old" : "new"; render(true); }
   else if (a === "clike"){ if (!need()) return; var ck = "c:" + b.dataset.c, cOn = !has(LK[ck] || [], ME); setLike(ck, cOn); render(true); if (cOn) burst('[data-act="clike"][data-c="' + b.dataset.c + '"]'); }
   else if (a === "qclear"){ ui.q = ""; ui.stab = "all"; render(false); }
@@ -2305,11 +2431,12 @@ document.addEventListener("click", function(e){
   }
   else if (a === "ctab"){ ui.ctab = b.dataset.t; render(true); }
   else if (a === "cjoin"){ if (!need()) return; toggle(S.fields, id); prune(S); saveProfile(); toast(has(S.fields, id) ? FBY[id].name + " 커뮤니티에 가입했어요." : FBY[id].name + " 커뮤니티에서 나왔어요."); render(true); }
-  else if (a === "cwrite"){ if (!need()) return; N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } tab("new"); }
+  else if (a === "cwrite"){ ui.sheet = null; if (!need()) return; N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } tab("new"); }
   else if (a === "tag"){ ui.q = b.dataset.q || ""; ui.stab = "all"; if (ui.tab !== "search" || ui.stack.length) tab("search"); else render(false); }
   else if (a === "ndeb"){ N.debate = !N.debate; render(true); }
   else if (a === "nmode"){ N.debate = b.dataset.t === "deb"; render(true); if (N.debate){ el = document.getElementById("ntopic"); if (el) el.focus(); } }
   else if (a === "cdebate"){
+    ui.sheet = null;
     if (!need()) return;
     N.debate = true;
     if (id && FBY[id]){ N.f = id; if (!has(S.fields, id) && id !== "etc"){ S.fields.push(id); saveProfile(); } }
