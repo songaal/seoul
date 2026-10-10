@@ -693,6 +693,13 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
 .pcover{background:linear-gradient(120deg,#3A30B0,#5A40D8)}
 .pcover .heroart{width:100%;-webkit-mask-image:none;mask-image:none;background-position:78% 42%}
 .pca .sp{flex:1}
+/* start screens: the planet from the design above, the mark and the buttons below it */
+.splash{position:relative;background:linear-gradient(175deg,#4A36C8 0%,#34309F 46%,#2E2D96 100%)}
+.splash::before{content:"";flex:0 1 30%}
+.splash > *{position:relative}
+.splash > .splashart{position:absolute;left:0;right:0;top:0;height:50%;max-width:none;background-size:cover;background-position:66% 45%;mix-blend-mode:screen;pointer-events:none;
+  -webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent);mask-image:linear-gradient(to bottom,#000 62%,transparent)}
+.brand.big .omark{width:84px;height:84px;filter:drop-shadow(0 12px 28px rgba(30,16,120,.55))}
 /* writing a post */
 .composer{border:1.5px solid rgba(255,255,255,.2);border-radius:18px;background:var(--surface-2);overflow:hidden}
 .composer:focus-within{border-color:var(--accent-hi)}
@@ -939,12 +946,12 @@ var I = {
   pin:    ico('<path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'),
   list:   ico('<rect x="6" y="5" width="12" height="14" rx="1"/><path d="M6 2.5h12M6 21.5h12"/>')
 };
-/* the logo beside the name: a ringed planet, as in the design (the app icon keeps the square mark) */
-var MARK = '<svg class="omark" viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="21" ry="7" fill="none" stroke="#CFC3FF" stroke-width="3" transform="rotate(-24 24 24)"/><circle cx="24" cy="24" r="11.5" fill="#A592FF"/><path d="M3 24a21 7 0 0 0 42 0" fill="none" stroke="#F1ECFF" stroke-width="3" stroke-linecap="round" transform="rotate(-24 24 24)"/></svg>';
+/* the logo is the app mark the owner supplied: a rounded purple square with two arcs and two moons around a centre */
+var MARK = '<svg class="omark" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22" fill="#6D5AE6"/><g fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" transform="translate(50 50) scale(1.12) translate(-50 -50)"><path d="M31.3 60.8A21.6 21.6 0 0 1 55.6 29.1"/><path d="M68.7 39.2A21.6 21.6 0 0 1 44.4 70.9"/><circle cx="50" cy="50" r="5.6"/><circle cx="65.3" cy="34.7" r="3.2" stroke-width="3"/><circle cx="34.7" cy="65.3" r="3.2" stroke-width="3"/></g></svg>';
 /* pictures cut from the design (community covers, the home banner): one style class each, so the picture data sits in the page once */
 (function(){
   var st = document.createElement("style");
-  st.textContent = Object.keys(ART).map(function(k){ return ".cv-" + k + "{background-image:url(" + ART[k] + ")}"; }).join("");
+  st.textContent = Object.keys(ART).map(function(k){ return ".cv-" + k + ".cv-" + k + ".cv-" + k + "{background-image:url(" + ART[k] + ")}";   /* the class three times over, so the picture wins wherever the page's own styles sit */ }).join("");
   document.head.appendChild(st);
 })();
 /* a like sends a few hearts floating up from the button; they live outside the redrawn area so a redraw cannot cut them short */
@@ -1524,10 +1531,10 @@ function openDue(){
 
 /* ---------- screens: start ---------- */
 function splashHTML(msg, retry){
-  return '<main class="splash"><div class="brand big">' + MARK + 'Orbit</div><p class="muted">' + msg + "</p>" + (retry ? '<button class="btn small" data-act="retry">다시 시도</button>' : "") + "</main>";
+  return '<main class="splash"><span class="splashart cv-hero" aria-hidden="true"></span><div class="brand big">' + MARK + 'Orbit</div><p class="muted">' + msg + "</p>" + (retry ? '<button class="btn small" data-act="retry">다시 시도</button>' : "") + "</main>";
 }
 function loginHTML(){
-  var h = '<main class="splash"><div class="brand big">' + MARK + 'Orbit</div><p class="muted">관심사로 이어지는 SNS</p>';
+  var h = '<main class="splash"><span class="splashart cv-hero" aria-hidden="true"></span><div class="brand big">' + MARK + 'Orbit</div><p class="muted">관심사로 이어지는 SNS</p>';
   if (ui.preview) return h + '<button class="btn primary wide" style="flex:none" data-act="start">프로필 만들기</button><p class="muted small">미리보기 모드예요. 글과 사진은 이 기기에만 저장됩니다.</p></main>';
   if (GU && !S) h += '<div class="lgcard">' + avatar({nick:GU.displayName || GU.email || "G", hue:205, photo:/^https:\/\//.test(GU.photoURL || "") ? GU.photoURL : ""}, 56) +
         '<div class="wt"><b>' + esc(GU.displayName || "구글 계정") + "</b><small>" + esc(GU.email || "") + "</small></div></div>" +
@@ -2844,7 +2851,7 @@ function enterPreview(){
   });
 }
 function setupHTML(){
-  return '<main class="splash"><div class="brand big">' + MARK + 'Orbit</div><p class="muted">' + esc(ui.bootMsg || "연결하지 못했어요. 새로 고쳐 주세요.") + "</p>" +
+  return '<main class="splash"><span class="splashart cv-hero" aria-hidden="true"></span><div class="brand big">' + MARK + 'Orbit</div><p class="muted">' + esc(ui.bootMsg || "연결하지 못했어요. 새로 고쳐 주세요.") + "</p>" +
     (ui.canPreview ? '<button class="btn primary wide" style="flex:none" data-act="preview">미리보기로 둘러보기</button>' +
       '<p class="muted small">미리보기는 구글 로그인 없이 들어가고, 글과 사진이 이 기기에만 저장됩니다. 실제 사이트는 README 순서대로 Firebase를 연결하면 켜집니다.</p>' : "") + "</main>";
 }
