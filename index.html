@@ -6,7 +6,7 @@
 <title>Orbit</title>
 <meta name="description" content="관심사로 이어지는 SNS">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#2E2A98">
+<meta name="theme-color" content="#1C1D3C">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Orbit">
@@ -26,27 +26,28 @@ img{max-width:100%}
    Wide screens: menu on the left, the screen in the middle, my card and trends on the right.
    Every interest owns a hue (--h); it colours its planet, its tiles and its dots. */
 :root{
-  --bg:#4A3BC8;
-  --surface:#2E2D96;
-  --surface-2:rgba(255,255,255,.09);
-  --surface-3:rgba(255,255,255,.17);
-  --ink:#FFFFFF;
-  --ink-2:#CDD0F7;
-  --line:rgba(255,255,255,.17);
-  --accent:#7A5CF0;
-  --accent-hi:#D2C8FF;
+  --bg:#121329;
+  --surface:#1C1D3C;
+  --surface-2:rgba(255,255,255,.055);
+  --surface-3:rgba(255,255,255,.11);
+  --ink:#F5F3FF;
+  --ink-2:#ADAED8;
+  --line:rgba(255,255,255,.10);
+  --accent:#8A4BE8;
+  --accent-hi:#D4B5FF;
   --accent-ink:#FFFFFF;
-  --grad:linear-gradient(90deg,#7A5CF0,#4F6BE6);
-  --accent-soft:rgba(150,130,255,.3);
-  --danger:#FFB4AC;
-  --ok:#74EBBD;
-  --heart:#FF86B4;
+  --grad:linear-gradient(90deg,#A23DE0,#6247EA);
+  --glow:0 0 22px rgba(170,80,240,.5);
+  --accent-soft:rgba(162,61,224,.28);
+  --danger:#FF9C94;
+  --ok:#5FE3B0;
+  --heart:#FF6FB5;
   --tile-l:52%;
   --tile-c:0.15;
   --tile-ink:#FFFFFF;
-  --stage:#17145A;
-  --scrim:rgba(20,14,84,.62);
-  --shadow:0 20px 50px rgba(22,12,100,.45);
+  --stage:#0C0D1E;
+  --scrim:rgba(8,8,24,.7);
+  --shadow:0 20px 50px rgba(0,0,0,.55);
   --stars:radial-gradient(1px 1px at 8% 18%,#fff 50%,transparent 51%),radial-gradient(1.5px 1.5px at 22% 72%,rgba(255,255,255,.8) 50%,transparent 51%),
           radial-gradient(1px 1px at 37% 34%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 52% 12%,#fff 50%,transparent 51%),
           radial-gradient(1px 1px at 63% 58%,rgba(255,255,255,.75) 50%,transparent 51%),radial-gradient(1px 1px at 74% 26%,rgba(255,255,255,.6) 50%,transparent 51%),
@@ -59,9 +60,8 @@ img{max-width:100%}
 
 html,body{height:100%}
 body{margin:0;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%;
-  background:radial-gradient(60% 50% at 10% 6%,rgba(226,130,255,.6),transparent 62%),radial-gradient(55% 45% at 90% 10%,rgba(120,176,255,.6),transparent 62%),
-    radial-gradient(60% 55% at 84% 96%,rgba(182,118,255,.55),transparent 62%),radial-gradient(50% 50% at 8% 92%,rgba(92,150,255,.55),transparent 62%),
-    linear-gradient(135deg,#6444DC,#4A5FE2 55%,#7350DE);background-attachment:fixed}
+  background:radial-gradient(55% 45% at 92% 4%,rgba(190,60,220,.30),transparent 62%),radial-gradient(50% 45% at 4% 96%,rgba(92,70,235,.34),transparent 62%),
+    radial-gradient(40% 35% at 50% 110%,rgba(210,60,190,.18),transparent 70%),#121329;background-attachment:fixed}
 *{box-sizing:border-box}
 button,input,textarea{font:inherit;color:inherit}
 button{cursor:pointer;background:none;border:0;padding:0}
@@ -587,7 +587,7 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
   .hero .planet{--ps:230px;right:-10px;margin-top:-115px}
   .crow2 .ccard{flex-basis:186px}
   .cgrid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
-  .pcimg{width:164px;height:124px}
+  .pcimg{width:164px;height:auto}
   .pc{padding:14px;gap:16px}
   .chero .cover{height:180px;border-radius:18px;margin-inline:16px;width:auto}
   .pcover{height:160px;border-radius:18px;margin-inline:16px}
@@ -602,11 +602,17 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
   .npop{left:auto;right:24px;top:80px;width:360px}
   .sheet{left:50%;right:auto;bottom:50%;transform:translate(-50%,50%);width:min(400px,92%);border-radius:20px;border-bottom:1px solid var(--line);padding:12px}
 }
-@media (min-width:1400px){
+@media (min-width:1200px){
   .shell.appv .rail{display:flex}
   .rail{width:310px;flex:none;flex-direction:column;gap:14px;padding:20px 16px;border-left:1px solid var(--line);overflow-y:auto;scrollbar-width:none}
   .card{border:1px solid var(--line);border-radius:16px;background:var(--surface-2);padding:14px;display:flex;flex-direction:column;gap:12px}
   .card h2{font-size:14.5px;font-weight:700}
+  .mecard{align-items:center;text-align:center}
+  .mecard .wt small{white-space:normal}
+  .mecard .stats{align-self:stretch}
+  .trend.act{align-items:flex-start}
+  .aline{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.4}
+  .card{background:rgba(255,255,255,.045)}
   .mrow{display:flex;align-items:center;gap:12px}
   .mrow .wt small{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
   .tlist{display:flex;flex-direction:column;gap:2px}
@@ -617,20 +623,20 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
 }
 
 /* ---------- glass look: bright violet-blue sky, translucent panels, gradient buttons ---------- */
-.shell{background:linear-gradient(165deg,#30279A 0%,#2B349E 55%,#2F2C96 100%)}
-@media (min-width:500px){.shell{height:calc(100% - 28px);top:14px;border:1px solid rgba(255,255,255,.24);border-radius:26px;box-shadow:0 30px 80px rgba(24,12,110,.45)}}
-.bar,.nav{background:rgba(34,30,124,.6);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.shell{background:linear-gradient(165deg,#1D1E3F 0%,#1A1B38 55%,#1C1A3A 100%)}
+@media (min-width:500px){.shell{height:calc(100% - 28px);top:14px;border:1px solid rgba(255,255,255,.10);border-radius:26px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 60px rgba(150,70,230,.12)}}
+.bar,.nav{background:rgba(24,25,52,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 .btn.primary,.fbtn,.sendbtn,.fab,.nav .plus span,.seg button[aria-selected="true"],.chip[aria-pressed="true"],.rank,.bub2.me,.ndot,.plusbtn{background:var(--grad);color:#fff}
 .fbtn[aria-pressed="true"]{background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)}
 .chip[aria-pressed="true"]{border-color:transparent}
-.btn.primary{border-radius:999px;box-shadow:0 10px 26px rgba(70,60,220,.45)}
+.btn.primary{border-radius:999px;box-shadow:0 8px 26px rgba(162,61,224,.45)}
 .btn.small{border-radius:999px}
 .input,.textarea{border-color:rgba(255,255,255,.2)}
 .input.sm{border-radius:999px;padding-inline:16px}
 .input:focus,.textarea:focus{border-color:var(--accent-hi)}
-.sheet{background:#33359E}
-.npop{background:#3C3EAC;border-color:rgba(255,255,255,.4)}
-.toast{color:#1B1670}
+.sheet{background:#26284F}
+.npop{background:#2C2E5C;border-color:rgba(190,120,255,.6);box-shadow:var(--shadow),var(--glow)}
+.toast{color:#1B1840}
 .btn.danger{color:#3A0A06}
 .ptabs{border-bottom:0;gap:6px;padding-inline:16px}
 .ptabs button{min-height:38px;border-bottom:0;margin:0;border-radius:999px}
@@ -645,10 +651,10 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
 .cnav,.ccount,.vbadge,.multi,.thumb .x{background:rgba(22,18,96,.78)}
 .nrow.new{border-color:rgba(255,255,255,.5)}
 .vbtn{background:rgba(255,255,255,.06)}
-.prow .ring,.prow .ring.on{background:#2E2D96;border-color:#2E2D96}
-.avw .on{border-color:#2E2D96}
+.prow .ring,.prow .ring.on{background:#1C1D3C;border-color:#1C1D3C}
+.avw .on{border-color:#1C1D3C}
 .gbar .chip{background:rgba(255,255,255,.08)}
-.splay{color:#2B2A86}
+.splay{color:#1C1D3C}
 .onlyd{display:none}
 .nav button{position:relative}
 .nav .ndot{top:6px;right:calc(50% - 24px)}
@@ -689,12 +695,12 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
 .heroart{position:absolute;inset:0 0 0 auto;width:56%;background-size:cover;background-position:70% 50%;mix-blend-mode:screen;pointer-events:none;
   -webkit-mask-image:linear-gradient(to right,transparent,#000 30%);mask-image:linear-gradient(to right,transparent,#000 30%)}
 .hero::after{display:none}
-.hero{background:radial-gradient(120% 150% at 86% 30%,#6C46E4 0%,#4C36C8 40%,#3A30B0 72%,#30299E 100%)}
-.pcover{background:linear-gradient(120deg,#3A30B0,#5A40D8)}
+.hero{border-color:rgba(200,130,255,.32);box-shadow:0 0 44px rgba(170,70,230,.22);background:radial-gradient(60% 120% at 58% 70%,rgba(214,58,196,.5) 0%,transparent 64%),linear-gradient(110deg,#241A62 0%,#3B1F86 45%,#2A1B6E 100%)}
+.pcover{background:linear-gradient(120deg,#241A62,#4A2296 60%,#8B2B9A)}
 .pcover .heroart{width:100%;-webkit-mask-image:none;mask-image:none;background-position:78% 42%}
 .pca .sp{flex:1}
 /* start screens: the planet from the design above, the mark and the buttons below it */
-.splash{position:relative;background:linear-gradient(175deg,#4A36C8 0%,#34309F 46%,#2E2D96 100%)}
+.splash{position:relative;background:radial-gradient(70% 40% at 60% 30%,rgba(214,58,196,.28),transparent 70%),linear-gradient(175deg,#2A1B6E 0%,#1F1C4A 46%,#1A1B38 100%)}
 .splash::before{content:"";flex:0 1 30%}
 .splash > *{position:relative}
 .splash > .splashart{position:absolute;left:0;right:0;top:0;height:50%;max-width:none;background-size:cover;background-position:66% 45%;mix-blend-mode:screen;pointer-events:none;
@@ -721,21 +727,80 @@ button.nrow:hover,.trow2:hover{background:var(--surface-3)}
 .cpick button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--ink)}
 .cpick button[aria-pressed="true"] .cdot{box-shadow:0 0 0 3px #fff}
 @media (min-width:1000px){
-  .shell.appv{max-width:1380px;width:calc(100% - 28px);background:linear-gradient(165deg,rgba(48,40,160,.74),rgba(40,52,166,.74));backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)}
-  .snav button[aria-current="page"]{background:rgba(255,255,255,.17);box-shadow:inset 0 0 0 1px rgba(255,255,255,.2)}
+  .shell.appv{max-width:1420px;width:calc(100% - 28px);background:linear-gradient(165deg,#1D1E3F,#191A36)}
+  .snav button[aria-current="page"]{background:#1C1D3C;color:#fff;box-shadow:0 6px 18px rgba(20,10,60,.45)}
   .tsearch{border-radius:999px}
   .onlyd{display:grid}
   .onlym{display:none}
   .cgrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
   .cover{aspect-ratio:4/3}
   .promo{border-color:rgba(255,255,255,.24);background:var(--stars),radial-gradient(130% 120% at 80% 0%,#8A5BFF 0%,#4B38CC 50%,#30299C 100%)}
-  .pcimg{width:210px;height:128px}
+  .pcimg{width:200px;height:auto}
   .hero::after{width:520px;height:230px;margin-top:-115px;right:-120px}
   .cpick{margin-inline:0;padding-inline:0}
   .crow2{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));overflow:visible}
+  .cfeat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}
+  .cfeat .ccard{flex:none}
+  .hgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .side{background:linear-gradient(180deg,#4B2FA8 0%,#6A45C6 55%,#7E55D4 100%);border-right:0}
+  .side .brand,.snav button,.srow2,.sme{color:rgba(255,255,255,.92)}
+  .snav button:hover,.srow2:hover,.sme:hover,.sme[aria-current="page"]{background:rgba(20,10,60,.28);color:#fff}
+  .smy .h3,.smy .link.sm,.sme small,.smy > p{color:rgba(255,255,255,.78)}
+  .side .cdot{box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
   .crow2 .ccard:nth-child(n+5){display:none}
-  .promo{padding-top:74px;background:linear-gradient(160deg,#3C2FB4,#2E2A98)}
+  .promo{padding-top:74px;border-color:rgba(255,255,255,.18);background:linear-gradient(160deg,#2A1B6E,#1F1C4A)}
   .promoart{position:absolute;inset:0 0 auto 0;height:70%;background-size:cover;background-position:center;mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent);mask-image:linear-gradient(to bottom,#000 55%,transparent)}
+}
+
+/* ---------- look borrowed in spirit from the reference the owner sent: dark navy, purple-to-magenta light, three columns ---------- */
+.ring.on{box-shadow:0 0 12px rgba(180,90,255,.55)}
+.fab,.nav .plus span,.sendbtn{box-shadow:0 8px 24px rgba(162,61,224,.5)}
+.seg button[aria-selected="true"],.chip[aria-pressed="true"]{box-shadow:0 4px 16px rgba(162,61,224,.35)}
+.fbtn{box-shadow:0 4px 14px rgba(162,61,224,.3)}
+.fbtn[aria-pressed="true"]{box-shadow:inset 0 0 0 1px rgba(255,255,255,.22)}
+.pc,.ccard,.hcard,.nrow,.trow2{transition:border-color .15s,box-shadow .15s}
+.pc:hover,.ccard:hover,.hcard:hover{border-color:rgba(190,120,255,.5);box-shadow:0 0 26px rgba(160,80,240,.22)}
+/* community cards: picture, name, a short description, members, join */
+.cfeat{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 16px 6px;scroll-snap-type:x proximity;scroll-padding-inline:16px}
+.cfeat .ccard{flex:0 0 212px;scroll-snap-align:start}
+.cfeat .cover,.crow2 .cover{aspect-ratio:16/10}
+.cgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.cgrid .cover{aspect-ratio:16/10}
+.ccard{border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.04))}
+.ccb{padding:10px 12px 12px;gap:10px}
+.ccn b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ccn span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12.5px;color:var(--ink-2);line-height:1.45;margin-top:3px;min-height:2.9em}
+.ccn small{display:flex;align-items:center;gap:5px;margin-top:6px;font-size:11.5px;color:var(--ink-2);font-weight:500}
+.ccn small svg.i{width:13px;height:13px}
+.ccb .fbtn{min-height:36px;font-size:13px}
+.cdot.onc{left:10px;bottom:-14px;--cs:34px;box-shadow:0 0 0 3px #22234A,0 0 14px rgba(180,90,255,.6)}
+.ccov{position:relative;z-index:1}
+.ccov .cover{overflow:visible}
+.ccov .cover.pic,.hcov .cover{border-radius:0}
+.ccard .ccb{padding-top:18px}
+.hgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:10px}
+.hcard{display:flex;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.04));min-height:118px}
+.hcov{flex:0 0 38%;position:relative;display:block;overflow:hidden;border-radius:0 46% 46% 0 / 0 50% 50% 0}
+.hcov .cover{position:absolute;inset:0;aspect-ratio:auto;height:100%}
+.hcov .onc{display:none}
+.hcb{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding:12px 12px 12px 14px}
+.hcb .fbtn{align-self:flex-start;min-height:32px}
+/* pictures in posts are shown whole */
+.carwrap{max-width:min(100%,calc(72vh * var(--ar,1.333)));margin-inline:auto}
+.car > *{aspect-ratio:var(--ar,4/3);object-fit:contain;background:var(--stage)}
+.vtap img{object-fit:contain}
+.pcimg{height:auto;aspect-ratio:var(--ar,1)}
+.pcimg .tile{aspect-ratio:1;height:auto}
+/* me in the right column: a lit ring round the picture */
+.glowav{display:inline-grid;border-radius:50%;padding:4px;background:conic-gradient(from 210deg,#6FE3FF,#A23DE0,#FF6FB5,#6247EA,#6FE3FF);box-shadow:0 0 26px rgba(180,90,255,.55)}
+.glowav .av{box-shadow:0 0 0 4px #1C1D3C}
+
+.aline b{display:inline}
+@media (min-width:1000px){
+  .cfeat{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}
+  .cfeat .ccard{flex:none}
+  .hgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .cgrid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
 }
 
 @media (prefers-reduced-motion:no-preference){
@@ -1188,7 +1253,7 @@ function kept(m, r){ URLS[r.id] = r.url; m.id = r.id; if (assets.durable) m.src 
 function media(p){
   if (p.media && p.media.length){
     var n = p.media.length, many = n > 1, pos = many ? Math.min(ui.car[p.id] || 0, n - 1) : 0;
-    var h = '<div class="carwrap" data-car="' + p.id + '"><div class="car" tabindex="0" aria-label="사진·동영상 ' + n + '개">' + p.media.map(function(m, i){
+    var h = '<div class="carwrap" data-car="' + p.id + '" style="--ar:' + shapeOf(p).toFixed(3) + '"><div class="car" tabindex="0" aria-label="사진·동영상 ' + n + '개">' + p.media.map(function(m, i){
       if (m.k === "vid" && m.cv && !VURL[m.cv]){   /* kept as pieces in the database: fetched only when pressed */
         var pct = VLOAD[m.cv];
         return '<button class="vtap" data-act="vload" data-cv="' + esc(m.cv) + '" data-n="' + (+m.n || 0) + '" data-type="' + esc(m.type || "video/mp4") + '"' + (pct != null ? " disabled" : "") + ' aria-label="동영상 불러와서 보기">' +
@@ -1682,7 +1747,9 @@ function stripItem(a){
 function homeHTML(){
   var nt = noteOf(S), tt = tuneTotals(), hidden = tt.total - tt.shown, realN = RP.length, fd = feed(), m = ui.feedMode;
   var h = '<section class="hero"><div class="herot"><h1>Find Your Community</h1><p>관심사가 같은 사람들과<br>더 넓은 세상을 만나보세요.</p><button class="btn primary" data-act="nav" data-t="comms">커뮤니티 둘러보기 →</button></div><span class="heroart cv-hero" aria-hidden="true"></span></section>';
-  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">추천 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기 ›</button></div><div class="crow2">' + featured().slice(0, 8).map(ccard).join("") + "</div></section>";
+  var feat = featured(), fresh = feat.filter(function(F){ return !has(S.fields, F.id); }), recs = (fresh.length >= 3 ? fresh : feat).slice(0, 6);
+  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">추천 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기 ›</button></div><div class="cfeat">' + recs.map(ccard).join("") + "</div></section>";
+  h += '<section class="group"><div class="rowhead pad"><h2 class="h2">지금 인기 커뮤니티</h2><button class="link sm" data-act="nav" data-t="comms">전체 보기 ›</button></div><div class="hgrid pad">' + feat.slice(0, 4).map(hcard).join("") + "</div></section>";
   var rooms = allPosts().filter(function(p){ return p.debate; }).sort(function(a, b){ return ptime(b) - ptime(a); }).slice(0, 3);
   if (rooms.length) h += '<section class="group"><div class="rowhead pad"><h2 class="h2">열린 토론방</h2><button class="link sm" data-act="etabgo" data-t="deb">전체 보기 ›</button></div><div class="nlist">' + rooms.map(function(p){
       var v = votes(p.id), tot = v.pro + v.con, F = FBY[p.f] || FBY.etc;
@@ -2069,7 +2136,7 @@ function pcard(p){
   }
   var meta = [p.f && FBY[p.f] ? FBY[p.f].name : "", p.ex ? p.tag : ago(ptime(p)), p.ex ? "예시" : "", p.capsule ? "타임캡슐" : ""].filter(Boolean).join(" · ");
   var h = '<article class="pc' + (th ? "" : " nothumb") + '">';
-  if (th) h += '<button class="pcimg" data-act="post" data-id="' + p.id + '" aria-label="게시물 보기">' + th + "</button>";
+  if (th) h += '<button class="pcimg" data-act="post" data-id="' + p.id + '"' + (m ? ' style="--ar:' + shapeOf(p).toFixed(3) + '"' : "") + ' aria-label="게시물 보기">' + th + "</button>";
   h += '<div class="pcb"><div class="pch"><button class="who" data-act="user" data-id="' + esc(a.id) + '">' + av(a.id, 30) + '<span class="wt"><b>' + esc(a.name) + "</b><small>" + esc(meta) + "</small></span></button></div>";
   h += '<button class="pct" data-act="post" data-id="' + p.id + '">' + (tb[0] ? "<b>" + esc(tb[0]) + "</b>" : "") + (tb[1] ? "<span>" + esc(tb[1]) + "</span>" : "") +
        (p.t ? "" : '<span class="muted">' + (m && m.k === "vid" ? "동영상" : "사진") + " 게시물</span>") + "</button>";
@@ -2110,7 +2177,12 @@ function joinBtn(f){
 }
 function ccard(F){
   return '<div class="ccard"><button class="ccov" data-act="comm" data-id="' + F.id + '" aria-label="' + esc(F.name) + ' 커뮤니티 보기">' + coverHTML(F) + "</button>" +
-    '<div class="ccb"><button class="ccn" data-act="comm" data-id="' + F.id + '"><b>' + esc(F.name) + "</b><small>" + fmt(members(F.id).length) + " 멤버</small></button>" + joinBtn(F.id) + "</div></div>";
+    '<div class="ccb"><button class="ccn" data-act="comm" data-id="' + F.id + '"><b>' + esc(F.name) + "</b>" + (F.d ? "<span>" + esc(F.d) + "</span>" : "") + '<small>' + I.user + fmt(members(F.id).length) + " 멤버</small></button>" + joinBtn(F.id) + "</div></div>";
+}
+/* the same, lying down: picture on the left */
+function hcard(F){
+  return '<div class="hcard"><button class="hcov" data-act="comm" data-id="' + F.id + '" aria-label="' + esc(F.name) + ' 커뮤니티 보기">' + coverHTML(F) + "</button>" +
+    '<div class="hcb"><button class="ccn" data-act="comm" data-id="' + F.id + '"><b>' + esc(F.name) + "</b>" + (F.d ? "<span>" + esc(F.d) + "</span>" : "") + '<small>' + I.user + fmt(members(F.id).length) + " 멤버 · 게시물 " + commPosts(F.id).length + "개</small></button>" + joinBtn(F.id) + "</div></div>";
 }
 function featured(){
   /* lively communities first, then the rest in their usual order */
@@ -2182,13 +2254,21 @@ function trendRows(){
 }
 function railHTML(){
   var followers = FOL.filter(function(x){ return x.t === ME; }).length, friends = MYF.filter(function(id){ return PROF[id] && !has(BLOCKS, id) && online(id); });
-  var h = '<aside class="rail" aria-label="내 정보와 트렌드"><section class="card"><div class="mrow">' + avatar(S, 48) + '<div class="wt"><b>' + esc(S.nick) + "</b><small>" + esc(snip(S.bio || "자기소개가 아직 없어요.", 44)) + "</small></div></div>" +
+  var acts = ME === "guest" ? [] : notifs().slice(0, 4);
+  var fresh = Object.keys(PROF).filter(function(id){ return id !== ME && !has(BLOCKS, id) && PROF[id].joinedAt; }).sort(function(a, b){ return PROF[b].joinedAt - PROF[a].joinedAt; }).slice(0, 4);
+  var h = '<aside class="rail" aria-label="내 정보와 활동"><section class="card mecard"><span class="glowav">' + avatar(S, 84) + '</span><div class="wt"><b>' + esc(S.nick) + "</b><small>" + esc(snip(S.bio || "자기소개가 아직 없어요.", 44)) + "</small></div>" +
     '<div class="stats"><span><b>' + postsOf(ME).length + "</b><span>게시물</span></span><span><b>" + followers + "</b><span>팔로워</span></span><span><b>" + MYF.length + "</b><span>팔로잉</span></span></div>" +
     '<button class="btn small wide" data-act="nav" data-t="profile">프로필 보기</button></section>';
-  h += '<section class="card"><div class="rowhead"><h2>실시간 트렌드</h2><button class="link sm" data-act="nav" data-t="search">전체 보기</button></div><div class="tlist">' + trendRows() + "</div></section>";
+  h += '<section class="card"><div class="rowhead"><h2>최근 활동</h2><button class="link sm" data-act="nav" data-t="notif">전체 보기</button></div>' + (acts.length
+      ? '<div class="tlist">' + acts.map(function(n){ return '<button class="trend act" ' + notifAct(n) + ">" + av(n.u, 34) + '<span class="tt"><span class="aline">' + notifLine(n) + "</span><small>" + ago(n.at) + "</small></span></button>"; }).join("") + "</div>"
+      : '<p class="muted small">좋아요, 댓글, 팔로우가 생기면 여기에 바로 보여요.</p>') + "</section>";
+  h += '<section class="card"><div class="rowhead"><h2>새 멤버</h2><button class="link sm" data-act="nav" data-t="search">사람 찾기</button></div>' + (fresh.length
+      ? '<div class="tlist">' + fresh.map(function(id){ return '<button class="trend" data-act="user" data-id="' + esc(id) + '">' + avOn(id, 34) + '<span class="tt"><b>' + esc(who(id).name) + "</b><small>" + ago(PROF[id].joinedAt) + " 가입</small></span></button>"; }).join("") + "</div>"
+      : '<p class="muted small">새로 가입한 사람이 여기에 보여요.</p>') + "</section>";
   h += '<section class="card"><div class="rowhead"><h2>온라인 친구</h2></div>' + (friends.length
-      ? '<div class="tlist">' + friends.slice(0, 8).map(function(id){ return '<button class="trend" data-act="user" data-id="' + esc(id) + '">' + avOn(id, 34) + '<span class="tt"><b>' + esc(who(id).name) + "</b><small>지금 접속 중</small></span></button>"; }).join("") + "</div>"
+      ? '<div class="tlist">' + friends.slice(0, 6).map(function(id){ return '<button class="trend" data-act="user" data-id="' + esc(id) + '">' + avOn(id, 34) + '<span class="tt"><b>' + esc(who(id).name) + "</b><small>지금 접속 중</small></span></button>"; }).join("") + "</div>"
       : '<p class="muted small">' + (MYF.length ? "지금 접속 중인 친구가 없어요." : "사람을 팔로우하면, 그 사람이 접속했을 때 여기에 보여요.") + "</p>") + "</section>";
+  h += '<section class="card"><div class="rowhead"><h2>실시간 트렌드</h2><button class="link sm" data-act="nav" data-t="search">전체 보기</button></div><div class="tlist">' + trendRows() + "</div></section>";
   return h + "</aside>";
 }
 function activeNav(){
@@ -2318,7 +2398,7 @@ function finish(){
 }
 
 /* ---------- photos and videos ---------- */
-function shrink(file, size, q, asData){
+function shrink(file, size, q, asData, whole){
   return new Promise(function(res, rej){
     var fr = new FileReader();
     fr.onerror = rej;
@@ -2326,11 +2406,17 @@ function shrink(file, size, q, asData){
       var img = new Image();
       img.onerror = rej;
       img.onload = function(){
-        var c = document.createElement("canvas"); c.width = c.height = size;
-        var s = Math.min(img.width, img.height);
-        c.getContext("2d").drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
-        if (asData){ var d = c.toDataURL("image/jpeg", q); res({data:d, url:d}); }
-        else c.toBlob(function(b){ if (b) res({blob:b, url:URL.createObjectURL(b)}); else rej(new Error("encode")); }, "image/jpeg", q);
+        var c = document.createElement("canvas"), s = Math.min(img.width, img.height);
+        if (whole){   /* the whole picture, its longer side brought down to "size" */
+          var k = Math.min(1, size / Math.max(img.width, img.height));
+          c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+          c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        } else {
+          c.width = c.height = size;
+          c.getContext("2d").drawImage(img, (img.width - s) / 2, (img.height - s) / 2, s, s, 0, 0, size, size);
+        }
+        if (asData){ var d = c.toDataURL("image/jpeg", q); res({data:d, url:d, w:c.width, h:c.height}); }
+        else c.toBlob(function(b){ if (b) res({blob:b, url:URL.createObjectURL(b), w:c.width, h:c.height}); else rej(new Error("encode")); }, "image/jpeg", q);
       };
       img.src = fr.result;
     };
@@ -2346,10 +2432,11 @@ function posterOf(url){
     v.addEventListener("loadeddata", function(){ try{ v.currentTime = Math.min(0.1, (v.duration || 1) / 2); }catch(e){ fin(); } });
     v.addEventListener("seeked", function(){
       try{
-        var s = Math.min(v.videoWidth, v.videoHeight); if (!s) return fin();
-        var c = document.createElement("canvas"); c.width = c.height = 720;
-        c.getContext("2d").drawImage(v, (v.videoWidth - s) / 2, (v.videoHeight - s) / 2, s, s, 0, 0, 720, 720);
-        c.toBlob(function(b){ fin(b); }, "image/jpeg", 0.8);
+        if (!v.videoWidth || !v.videoHeight) return fin();
+        var k = Math.min(1, 720 / Math.max(v.videoWidth, v.videoHeight)), c = document.createElement("canvas");
+        c.width = Math.max(1, Math.round(v.videoWidth * k)); c.height = Math.max(1, Math.round(v.videoHeight * k));
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);   /* the whole frame, not a square cut from it */
+        c.toBlob(function(b){ if (b){ b.pw = c.width; b.ph = c.height; } fin(b); }, "image/jpeg", 0.8);
       }catch(e){ fin(); }
     });
     v.addEventListener("error", function(){ fin(); });
@@ -2369,7 +2456,7 @@ function videoType(file){
 function addFiles(files){
   var room = MAX_ITEMS - N.items.length, list = Array.prototype.slice.call(files, 0, room), msg = files.length > room ? "한 게시물에 " + MAX_ITEMS + "개까지 올릴 수 있어요." : "";
   var jobs = list.map(function(f){
-    if (/^image\//.test(f.type)) return shrink(f, assets ? 1080 : DATA_PX, assets ? 0.85 : DATA_Q, !assets).then(function(r){ r.k = "img"; return r; }, function(){ msg = "읽지 못한 사진이 있어요. 다른 파일로 다시 시도하세요."; return null; });
+    if (/^image\//.test(f.type)) return shrink(f, assets ? 1440 : DATA_PX, assets ? 0.85 : DATA_Q, !assets, true).then(function(r){ r.k = "img"; return r; }, function(){ msg = "읽지 못한 사진이 있어요. 다른 파일로 다시 시도하세요."; return null; });
     var vt = videoType(f);
     if (!vt && !/^video\//.test(f.type)){ msg = "사진이나 동영상 파일만 올릴 수 있어요."; return Promise.resolve(null); }
     if (!assets && !vstore){ msg = "지금 설정에서는 사진만 올릴 수 있어요."; return Promise.resolve(null); }
@@ -2378,6 +2465,7 @@ function addFiles(files){
     var url = URL.createObjectURL(f);
     return posterOf(url).then(function(b){
       var it = {k:"vid", file:f, type:vt, url:url, poster:b};
+      if (b && b.pw){ it.w = b.pw; it.h = b.ph; }
       if (assets || !b) return it;
       return blobData(b).then(function(d){ it.pdata = d; return it; }, function(){ return it; });   /* no file storage: the still frame travels inside the post */
     });
@@ -2388,6 +2476,14 @@ function addFiles(files){
     render(true);
   });
 }
+function dims(m, it){ if (it.w && it.h){ m.w = it.w; m.h = it.h; } return m; }   /* width and height travel with the picture, so the page can give it the right shape */
+/* the shape a post's pictures are shown in: the first picture's own shape, kept between tall (3:4) and wide (1.91:1).
+   pictures from before this change were cut square when they were uploaded, so they are shown square */
+function shapeOf(p){
+  var m = p.media && p.media[0]; if (!m) return 1;
+  var ar = m.w && m.h ? m.w / m.h : (m.k === "vid" ? 4 / 3 : 1);
+  return Math.max(0.75, Math.min(1.91, ar));
+}
 function setProg(t){ ui.prog = t; var b = document.getElementById("pubBtn"); if (b) b.textContent = t; }
 function uploadAll(items){
   var out = [], i = 0;
@@ -2397,11 +2493,11 @@ function uploadAll(items){
     setProg("올리는 중 " + (i + 1) + "/" + items.length);
     if (!assets) job = it.k === "vid"
       ? vstore.put(it.file, it.type, function(d, n){ setProg("동영상 올리는 중 " + Math.round(d / n * 100) + "%"); }).then(function(r){
-          var m = {k:"vid", cv:r.id, n:r.n, type:it.type, size:it.file.size}; if (it.pdata) m.psrc = it.pdata; return m; })
-      : Promise.resolve({k:"img", src:it.data});
-    else if (it.k === "img") job = assets.upload(it.blob, {type:"image/jpeg"}).then(function(r){ return kept({k:"img"}, r); });
+          var m = {k:"vid", cv:r.id, n:r.n, type:it.type, size:it.file.size}; if (it.pdata) m.psrc = it.pdata; return dims(m, it); })
+      : Promise.resolve(dims({k:"img", src:it.data}, it));
+    else if (it.k === "img") job = assets.upload(it.blob, {type:"image/jpeg"}).then(function(r){ return kept(dims({k:"img"}, it), r); });
     else job = assets.upload(it.file, {type:it.type}).then(function(r){
-      var m = kept({k:"vid"}, r);
+      var m = kept(dims({k:"vid"}, it), r);
       if (!it.poster) return m;
       return assets.upload(it.poster, {type:"image/jpeg"}).then(function(pr){ URLS[pr.id] = pr.url; m.poster = pr.id; if (assets.durable) m.psrc = pr.url; return m; }, function(){ return m; });
     });
